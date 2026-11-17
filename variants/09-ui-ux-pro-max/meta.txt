@@ -1,5 +1,5 @@
 name=UI UX Pro Max
-fonts=Manrope:wght@400;600;800&family=IBM+Plex+Mono:wght@500;600
+fonts=Fira+Sans:wght@400;500;600;700&family=Fira+Code:wght@500;600
 colors=["#f2b84b", "#4cc9f0", "#b388ff", "#3ecf8e"]
-status=pending
-note=
+status=done
+note=Data-dashboard pass from the UI UX Pro Max database: dense spacing, Fira Sans and Fira Code figures, chart types marked by shape as well as colour, keyboard-operable bars, announced table sorting, 44px touch targets.

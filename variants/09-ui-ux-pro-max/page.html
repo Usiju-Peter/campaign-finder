@@ -212,9 +212,9 @@
   <section class="cf-charts">
     <div class="cf-panel" id="map">
       <h2>Budget left vs competition</h2>
-      <p class="cf-hint">Top-left is the sweet spot: lots of money, few creators. Drag a box to filter the table; double-click to clear.</p>
+      <p class="cf-hint">Top-left is the sweet spot: lots of money, few creators. Drag a box to filter the table; double-click to clear. On a keyboard, use Budget and its creator limits in the top bar.</p>
       <div class="cf-chart" data-draw="scatter" data-source="campaigns"></div>
-      <div class="cf-legend"><span><i style="background:var(--cf-c0)"></i>Clipping</span><span><i style="background:var(--cf-c1)"></i>UGC</span><span><i style="background:var(--cf-c2)"></i>Slideshow</span><span>Bigger dot = higher pay per 1K</span></div>
+      <div class="cf-legend"><span><svg width="12" height="12" viewBox="-6 -6 12 12" aria-hidden="true"><circle r="5" style="fill:var(--cf-c0)"/></svg>Clipping</span><span><svg width="12" height="12" viewBox="-6 -6 12 12" aria-hidden="true"><rect x="-4.5" y="-4.5" width="9" height="9" style="fill:var(--cf-c1)"/></svg>UGC</span><span><svg width="12" height="12" viewBox="-6 -6 12 12" aria-hidden="true"><path d="M0 -6 L6 0 L0 6 L-6 0Z" style="fill:var(--cf-c2)"/></svg>Slideshow</span><span>Bigger dot = higher pay per 1K</span></div>
     </div>
     <div class="cf-panel" id="cats">
       <h2>Budget left by category</h2>
@@ -421,7 +421,7 @@
     T(el, `Showing ${F.int(n)} of ${F.int(v.length)}. Click a column to sort.`);
     const m = document.getElementById('f-more'); if (m) m.hidden = v.length <= window.CF.limit;
     const c = document.getElementById('f-clearsel'); if (c) c.hidden = !window.CF.brush;
-    document.querySelectorAll('.cf-th[data-sort]').forEach((th) => th.classList.toggle('cf-sorted', th.dataset.sort === window.CF.sort));
+    document.querySelectorAll('.cf-th[data-sort]').forEach((th) => { const on = th.dataset.sort === window.CF.sort; th.classList.toggle('cf-sorted', on); if (on) th.setAttribute('aria-sort', /_asc$|^campaign$|^type$/.test(window.CF.sort) ? 'ascending' : 'descending'); else th.removeAttribute('aria-sort'); });
   });
 
   // ---------- top picks ----------
@@ -524,8 +524,9 @@
     svg.append('text').attr('x', W - m.r).attr('y', H - 4).attr('text-anchor', 'end').text('Creators (log scale) →');
     svg.append('text').attr('x', m.l).attr('y', m.t + 2).attr('dy', '0.7em').attr('dx', 6).text('↑ Budget left');
     const inB = (r, b) => !b || (r.creators + 1 >= b.x0 && r.creators + 1 <= b.x1 && r.left + 1 >= b.y0 && r.left + 1 <= b.y1);
-    const dots = svg.append('g').selectAll('circle').data(pts, (r) => r.id).join('circle').attr('class', 'cf-dot')
-      .attr('cx', (r) => x(r.creators + 1)).attr('cy', (r) => y(r.left + 1)).attr('r', (r) => rr(r.per_post ? 1 : r.rate))
+    const SHAPE = { Clipping: d3.symbolCircle, UGC: d3.symbolSquare, Slideshow: d3.symbolDiamond };
+    const dots = svg.append('g').selectAll('path').data(pts, (r) => r.id).join('path').attr('class', 'cf-dot')
+      .attr('transform', (r) => `translate(${x(r.creators + 1)},${y(r.left + 1)})`).attr('d', (r) => d3.symbol(SHAPE[r.type] || d3.symbolCircle, Math.PI * Math.pow(rr(r.per_post ? 1 : r.rate), 2))())
       .style('fill', (r) => col[r.type] || dash.colors[0]).classed('cf-out', (r) => !inB(r, window.CF.brush));
     const tip = d3.select(el).append('div').attr('class', 'cf-tip').style('opacity', 0);
     const brush = d3.brush().extent([[m.l, m.t], [W - m.r, H - m.b]])
@@ -569,6 +570,9 @@
     const x = d3.scaleLinear().domain([0, d3.max(data, (d) => d.left) || 1]).range([0, W - lw - vw]);
     const g = svg.append('g').selectAll('g').data(data).join('g').attr('class', 'cf-bar').attr('transform', (d, i) => `translate(0,${i * (bh + gap) + 4})`)
       .classed('cf-dim', (d) => window.CF.cats.length && !window.CF.cats.includes(d.cat))
+      .attr('tabindex', 0).attr('role', 'button').attr('aria-pressed', (d) => String(window.CF.cats.includes(d.cat)))
+      .attr('aria-label', (d) => `${d.cat}: ${F.money(d.left)} left in ${d.n} campaigns. Press Enter to filter.`)
+      .on('keydown', function (ev) { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); this.dispatchEvent(new MouseEvent('click', { bubbles: true })); } })
       .on('click', (ev, d) => {
         const c = window.CF.cats; window.CF.cats = c.includes(d.cat) ? c.filter((x) => x !== d.cat) : [...c, d.cat]; window.CF.limit = 100;
         window.CF_redraw();

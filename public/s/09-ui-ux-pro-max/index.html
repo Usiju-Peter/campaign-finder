@@ -1,7 +1,7 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Campaign Finder · UI UX Pro Max</title>
 <meta name="description" content="Every Content Rewards campaign, refreshed every 4 hours. Design pass: UI UX Pro Max.">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;500;600;700&family=Fira+Code:wght@500;600&display=swap">
 <style>
 #dash-root { max-width: 1480px; margin: 0 auto; padding-block: 0 48px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
 body { margin: 0; background: var(--color-bg); color: var(--color-fg); font: 14px/1.45 var(--font-anthropic-sans); }
@@ -27,6 +27,53 @@ body { margin: 0; background: var(--color-bg); color: var(--color-fg); font: 14p
 .cf-table td:first-child { font-family: Manrope, sans-serif; font-size: 13px; }
 .cf-chip:has(input:checked) { border-color: #f2b84b; color: #f2b84b; }
 .cf-plat-tiktok, .cf-plat-x { background: #2b3a55; }
+
+/* ===== UI UX Pro Max pass: Dark Mode (OLED) style, dense dashboard dial (8), subtle motion dial (2) =====
+   Type: Fira Sans (text) + Fira Code (figures). Spacing scale 8-32px. Semantic: green = positive only. */
+:root {
+  --font-anthropic-sans: 'Fira Sans', system-ui, sans-serif; --font-anthropic-serif: 'Fira Code', ui-monospace, monospace;
+  --cds-gap-xs: 4px; --cds-gap-sm: 8px; --cds-gap-md: 12px; --cds-gap-lg: 16px; --cds-pad-lg: 16px;
+  --cds-font-size-caption: 12.5px; --cds-font-size-body: 14px; --cds-font-size-heading: 16px; --cds-font-size-title: 26px;
+  --color-ok: #22c55e; --gold: #f2b84b; --ring: #ffffff;
+}
+body { font-family: 'Fira Sans', system-ui, sans-serif; line-height: 1.5; }
+#dash-root { max-width: 1560px !important; }
+/* no glow, no gradient washes */
+.cf-hero { background: #0e1a2e !important; padding: 20px 24px !important; }
+.cf-hero h1 { font-size: 30px !important; font-weight: 700 !important; letter-spacing: -.01em; font-family: 'Fira Sans', sans-serif !important; }
+.cf-eyebrow { display: none; }
+.cf-pick { background: #101b2d !important; padding: 14px 16px !important; }
+.cf-pick-big { font-size: 28px !important; font-weight: 600; }
+.cf-pick-bar i { background: var(--gold) !important; }
+.cf-mark { background: var(--gold) !important; border-radius: 4px !important; }
+.cf-kpi { padding: 12px 16px !important; border-top-width: 1px !important; }
+.cf-kpi .cf-v { font-size: 24px !important; }
+.cf-charts .cf-chart { min-height: 280px; }
+/* figures in Fira Code with even-width digits */
+.cf-v, .cf-pick-big, .cf-table td:not(:first-child), .cf-dk-count, .cf-pick-meta b { font-family: 'Fira Code', ui-monospace, monospace !important; font-variant-numeric: tabular-nums; }
+.cf-table td:first-child { font-family: 'Fira Sans', sans-serif !important; }
+.cf-table th, .cf-table td { padding: 6px 8px !important; }
+.cf-table th { text-transform: none !important; letter-spacing: 0 !important; font-size: 12.5px !important; }
+/* colour is never the only signal: high pay is also heavier */
+.cf-rate-hi { font-weight: 700 !important; } .cf-rate-lo { font-weight: 400 !important; }
+.cf-th[aria-sort="descending"]::after { content: " \2193"; } .cf-th[aria-sort="ascending"]::after { content: " \2191"; }
+/* scatter: shapes at 0.7 opacity so dense clusters stay readable */
+.cf-dot { opacity: .78; stroke: #0a1220; stroke-width: 1; }
+.cf-dot.cf-out { opacity: .12; }
+.cf-legend span { display: inline-flex; align-items: center; gap: 5px; }
+/* every clickable thing says so; hover 150-300ms; visible focus ring */
+.cf-th, .cf-bar, .cf-dot, .cf-pick, .cf-tog, .cf-chip, .cf-opt, .cf-preset, button, a { cursor: pointer; }
+.cf-btn, .cf-dk-btn, .cf-seg, .cf-dk-icon, .cf-preset, .cf-opt, .cf-nav a, .cf-pick { transition: background-color 180ms ease-out, color 180ms ease-out, box-shadow 180ms ease-out; }
+.cf-bar:focus-visible rect { stroke: var(--ring); stroke-width: 2px; }
+.cf-bar:focus { outline: none; }
+:focus-visible { outline: 2px solid var(--ring) !important; outline-offset: 2px; }
+/* touch: 44x44 targets with 8px+ spacing */
+@media (pointer: coarse), (max-width: 760px) {
+  .cf-seg, .cf-dk-btn { min-height: 44px; } .cf-dk-icon { width: 44px !important; height: 44px !important; }
+  .cf-nav a, .cf-btn, .cf-opt, .cf-tog, .cf-preset { min-height: 44px; display: inline-flex; align-items: center; }
+  .cf-dk-plats { gap: 8px; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition-duration: 0ms !important; animation: none !important; } }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
 <script>window.__COLORS = ["#f2b84b", "#4cc9f0", "#b388ff", "#3ecf8e"]; window.__DATA_URL = '../../data/campaigns.json';</script>
@@ -268,9 +315,9 @@ window.dash = (() => {
   <section class="cf-charts">
     <div class="cf-panel" id="map">
       <h2>Budget left vs competition</h2>
-      <p class="cf-hint">Top-left is the sweet spot: lots of money, few creators. Drag a box to filter the table; double-click to clear.</p>
+      <p class="cf-hint">Top-left is the sweet spot: lots of money, few creators. Drag a box to filter the table; double-click to clear. On a keyboard, use Budget and its creator limits in the top bar.</p>
       <div class="cf-chart" data-draw="scatter" data-source="campaigns"></div>
-      <div class="cf-legend"><span><i style="background:var(--cf-c0)"></i>Clipping</span><span><i style="background:var(--cf-c1)"></i>UGC</span><span><i style="background:var(--cf-c2)"></i>Slideshow</span><span>Bigger dot = higher pay per 1K</span></div>
+      <div class="cf-legend"><span><svg width="12" height="12" viewBox="-6 -6 12 12" aria-hidden="true"><circle r="5" style="fill:var(--cf-c0)"/></svg>Clipping</span><span><svg width="12" height="12" viewBox="-6 -6 12 12" aria-hidden="true"><rect x="-4.5" y="-4.5" width="9" height="9" style="fill:var(--cf-c1)"/></svg>UGC</span><span><svg width="12" height="12" viewBox="-6 -6 12 12" aria-hidden="true"><path d="M0 -6 L6 0 L0 6 L-6 0Z" style="fill:var(--cf-c2)"/></svg>Slideshow</span><span>Bigger dot = higher pay per 1K</span></div>
     </div>
     <div class="cf-panel" id="cats">
       <h2>Budget left by category</h2>
@@ -477,7 +524,7 @@ window.dash = (() => {
     T(el, `Showing ${F.int(n)} of ${F.int(v.length)}. Click a column to sort.`);
     const m = document.getElementById('f-more'); if (m) m.hidden = v.length <= window.CF.limit;
     const c = document.getElementById('f-clearsel'); if (c) c.hidden = !window.CF.brush;
-    document.querySelectorAll('.cf-th[data-sort]').forEach((th) => th.classList.toggle('cf-sorted', th.dataset.sort === window.CF.sort));
+    document.querySelectorAll('.cf-th[data-sort]').forEach((th) => { const on = th.dataset.sort === window.CF.sort; th.classList.toggle('cf-sorted', on); if (on) th.setAttribute('aria-sort', /_asc$|^campaign$|^type$/.test(window.CF.sort) ? 'ascending' : 'descending'); else th.removeAttribute('aria-sort'); });
   });
 
   // ---------- top picks ----------
@@ -580,8 +627,9 @@ window.dash = (() => {
     svg.append('text').attr('x', W - m.r).attr('y', H - 4).attr('text-anchor', 'end').text('Creators (log scale) →');
     svg.append('text').attr('x', m.l).attr('y', m.t + 2).attr('dy', '0.7em').attr('dx', 6).text('↑ Budget left');
     const inB = (r, b) => !b || (r.creators + 1 >= b.x0 && r.creators + 1 <= b.x1 && r.left + 1 >= b.y0 && r.left + 1 <= b.y1);
-    const dots = svg.append('g').selectAll('circle').data(pts, (r) => r.id).join('circle').attr('class', 'cf-dot')
-      .attr('cx', (r) => x(r.creators + 1)).attr('cy', (r) => y(r.left + 1)).attr('r', (r) => rr(r.per_post ? 1 : r.rate))
+    const SHAPE = { Clipping: d3.symbolCircle, UGC: d3.symbolSquare, Slideshow: d3.symbolDiamond };
+    const dots = svg.append('g').selectAll('path').data(pts, (r) => r.id).join('path').attr('class', 'cf-dot')
+      .attr('transform', (r) => `translate(${x(r.creators + 1)},${y(r.left + 1)})`).attr('d', (r) => d3.symbol(SHAPE[r.type] || d3.symbolCircle, Math.PI * Math.pow(rr(r.per_post ? 1 : r.rate), 2))())
       .style('fill', (r) => col[r.type] || dash.colors[0]).classed('cf-out', (r) => !inB(r, window.CF.brush));
     const tip = d3.select(el).append('div').attr('class', 'cf-tip').style('opacity', 0);
     const brush = d3.brush().extent([[m.l, m.t], [W - m.r, H - m.b]])
@@ -625,6 +673,9 @@ window.dash = (() => {
     const x = d3.scaleLinear().domain([0, d3.max(data, (d) => d.left) || 1]).range([0, W - lw - vw]);
     const g = svg.append('g').selectAll('g').data(data).join('g').attr('class', 'cf-bar').attr('transform', (d, i) => `translate(0,${i * (bh + gap) + 4})`)
       .classed('cf-dim', (d) => window.CF.cats.length && !window.CF.cats.includes(d.cat))
+      .attr('tabindex', 0).attr('role', 'button').attr('aria-pressed', (d) => String(window.CF.cats.includes(d.cat)))
+      .attr('aria-label', (d) => `${d.cat}: ${F.money(d.left)} left in ${d.n} campaigns. Press Enter to filter.`)
+      .on('keydown', function (ev) { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); this.dispatchEvent(new MouseEvent('click', { bubbles: true })); } })
       .on('click', (ev, d) => {
         const c = window.CF.cats; window.CF.cats = c.includes(d.cat) ? c.filter((x) => x !== d.cat) : [...c, d.cat]; window.CF.limit = 100;
         window.CF_redraw();

@@ -16,3 +16,50 @@
 .cf-table td:first-child { font-family: Manrope, sans-serif; font-size: 13px; }
 .cf-chip:has(input:checked) { border-color: #f2b84b; color: #f2b84b; }
 .cf-plat-tiktok, .cf-plat-x { background: #2b3a55; }
+
+/* ===== UI UX Pro Max pass: Dark Mode (OLED) style, dense dashboard dial (8), subtle motion dial (2) =====
+   Type: Fira Sans (text) + Fira Code (figures). Spacing scale 8-32px. Semantic: green = positive only. */
+:root {
+  --font-anthropic-sans: 'Fira Sans', system-ui, sans-serif; --font-anthropic-serif: 'Fira Code', ui-monospace, monospace;
+  --cds-gap-xs: 4px; --cds-gap-sm: 8px; --cds-gap-md: 12px; --cds-gap-lg: 16px; --cds-pad-lg: 16px;
+  --cds-font-size-caption: 12.5px; --cds-font-size-body: 14px; --cds-font-size-heading: 16px; --cds-font-size-title: 26px;
+  --color-ok: #22c55e; --gold: #f2b84b; --ring: #ffffff;
+}
+body { font-family: 'Fira Sans', system-ui, sans-serif; line-height: 1.5; }
+#dash-root { max-width: 1560px !important; }
+/* no glow, no gradient washes */
+.cf-hero { background: #0e1a2e !important; padding: 20px 24px !important; }
+.cf-hero h1 { font-size: 30px !important; font-weight: 700 !important; letter-spacing: -.01em; font-family: 'Fira Sans', sans-serif !important; }
+.cf-eyebrow { display: none; }
+.cf-pick { background: #101b2d !important; padding: 14px 16px !important; }
+.cf-pick-big { font-size: 28px !important; font-weight: 600; }
+.cf-pick-bar i { background: var(--gold) !important; }
+.cf-mark { background: var(--gold) !important; border-radius: 4px !important; }
+.cf-kpi { padding: 12px 16px !important; border-top-width: 1px !important; }
+.cf-kpi .cf-v { font-size: 24px !important; }
+.cf-charts .cf-chart { min-height: 280px; }
+/* figures in Fira Code with even-width digits */
+.cf-v, .cf-pick-big, .cf-table td:not(:first-child), .cf-dk-count, .cf-pick-meta b { font-family: 'Fira Code', ui-monospace, monospace !important; font-variant-numeric: tabular-nums; }
+.cf-table td:first-child { font-family: 'Fira Sans', sans-serif !important; }
+.cf-table th, .cf-table td { padding: 6px 8px !important; }
+.cf-table th { text-transform: none !important; letter-spacing: 0 !important; font-size: 12.5px !important; }
+/* colour is never the only signal: high pay is also heavier */
+.cf-rate-hi { font-weight: 700 !important; } .cf-rate-lo { font-weight: 400 !important; }
+.cf-th[aria-sort="descending"]::after { content: " \2193"; } .cf-th[aria-sort="ascending"]::after { content: " \2191"; }
+/* scatter: shapes at 0.7 opacity so dense clusters stay readable */
+.cf-dot { opacity: .78; stroke: #0a1220; stroke-width: 1; }
+.cf-dot.cf-out { opacity: .12; }
+.cf-legend span { display: inline-flex; align-items: center; gap: 5px; }
+/* every clickable thing says so; hover 150-300ms; visible focus ring */
+.cf-th, .cf-bar, .cf-dot, .cf-pick, .cf-tog, .cf-chip, .cf-opt, .cf-preset, button, a { cursor: pointer; }
+.cf-btn, .cf-dk-btn, .cf-seg, .cf-dk-icon, .cf-preset, .cf-opt, .cf-nav a, .cf-pick { transition: background-color 180ms ease-out, color 180ms ease-out, box-shadow 180ms ease-out; }
+.cf-bar:focus-visible rect { stroke: var(--ring); stroke-width: 2px; }
+.cf-bar:focus { outline: none; }
+:focus-visible { outline: 2px solid var(--ring) !important; outline-offset: 2px; }
+/* touch: 44x44 targets with 8px+ spacing */
+@media (pointer: coarse), (max-width: 760px) {
+  .cf-seg, .cf-dk-btn { min-height: 44px; } .cf-dk-icon { width: 44px !important; height: 44px !important; }
+  .cf-nav a, .cf-btn, .cf-opt, .cf-tog, .cf-preset { min-height: 44px; display: inline-flex; align-items: center; }
+  .cf-dk-plats { gap: 8px; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition-duration: 0ms !important; animation: none !important; } }
