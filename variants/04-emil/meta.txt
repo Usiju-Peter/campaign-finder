@@ -1,5 +1,5 @@
 name=Emil Design Engineering
 fonts=Manrope:wght@400;600;800&family=IBM+Plex+Mono:wght@500;600
 colors=["#f2b84b", "#4cc9f0", "#b388ff", "#3ecf8e"]
-status=pending
-note=
+status=done
+note=Interaction pass: strong ease-out curves, buttons that press, menus that grow from their trigger and close instantly on Esc, a sliding type switch, crisp tooltip timing, hover only on real pointers.

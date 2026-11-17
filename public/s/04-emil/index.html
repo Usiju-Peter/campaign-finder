@@ -27,6 +27,65 @@ body { margin: 0; background: var(--color-bg); color: var(--color-fg); font: 14p
 .cf-table td:first-child { font-family: Manrope, sans-serif; font-size: 13px; }
 .cf-chip:has(input:checked) { border-color: #f2b84b; color: #f2b84b; }
 .cf-plat-tiktok, .cf-plat-x { background: #2b3a55; }
+
+/* ===== Emil pass: a professional dashboard should feel crisp and fast ===== */
+:root { --ease-out: cubic-bezier(0.23, 1, 0.32, 1); --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1); --gold:#f2b84b; }
+
+/* Buttons and every pressable thing answer the press (scale .97, 160ms ease-out) */
+.cf-btn, .cf-dk-btn, .cf-seg, .cf-dk-icon, .cf-preset, .cf-opt, .cf-nav a, .cf-pick {
+  transition: transform 160ms var(--ease-out), background-color 150ms ease, color 150ms ease, border-color 150ms ease, box-shadow 200ms var(--ease-out); }
+.cf-btn:active, .cf-dk-btn:active, .cf-seg:active, .cf-dk-icon:active, .cf-preset:active, .cf-opt:active { transform: scale(0.97); }
+.cf-pick:active { transform: scale(0.99); }
+
+/* Hover only for real pointers (touch would trigger it on tap) */
+.cf-pick:hover { transform: none; }
+@media (hover: hover) and (pointer: fine) {
+  .cf-pick:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(3,7,15,.45); }
+}
+
+/* Menus: grow from their trigger (top-left), never from nothing; exit faster than enter */
+.cf-pop { display: block !important; visibility: hidden; opacity: 0; transform: scale(0.96); transform-origin: top left;
+  transition: opacity 120ms var(--ease-out), transform 120ms var(--ease-out), visibility 0s linear 120ms; }
+.cf-pop.cf-open { visibility: visible; opacity: 1; transform: scale(1);
+  transition: opacity 180ms var(--ease-out), transform 180ms var(--ease-out), visibility 0s; }
+#pop-more, #pop-budget { transform-origin: top center; }
+@media (max-width: 1239px) {
+  .cf-pop { transform: translateX(-50%) scale(0.96); transform-origin: top center; }
+  .cf-pop.cf-open { transform: translateX(-50%) scale(1); }
+}
+/* keyboard-initiated close: no animation */
+.cf-pop.cf-instant, .cf-instant { transition: none !important; }
+
+/* Segmented type switch: one indicator slides between options */
+.cf-dk-seg { position: relative; }
+.cf-seg-ind { position: absolute; top: 3px; bottom: 3px; left: 3px; width: 0; border-radius: 999px; background: rgba(255,255,255,.16);
+  transition: transform 220ms var(--ease-in-out), width 220ms var(--ease-in-out); pointer-events: none; }
+.cf-seg { position: relative; z-index: 1; }
+.cf-seg[aria-pressed="true"] { background: transparent !important; }
+
+/* Toggles: colour changes use plain ease */
+.cf-dk-icon[aria-pressed="true"] { transition: background-color 150ms ease, color 150ms ease; }
+.cf-bar { transition: opacity 150ms ease; }
+.cf-dot { transition: opacity 150ms ease; }
+
+/* Tooltip: 125ms fade the first time, instant while gliding between dots */
+.cf-tip { transition: opacity 125ms var(--ease-out); }
+
+/* First data load only: the three picks arrive with a short, non-uniform stagger */
+@media (prefers-reduced-motion: no-preference) {
+  .cf-enter { animation: e-in 300ms var(--ease-out) both; }
+  .cf-enter-1 { animation-delay: 50ms; } .cf-enter-2 { animation-delay: 90ms; }
+  @keyframes e-in { from { opacity: 0; transform: translateY(8px); } }
+}
+/* Reduced motion: keep fades that aid comprehension, drop movement */
+@media (prefers-reduced-motion: reduce) {
+  .cf-pop, .cf-pop.cf-open { transform: none !important; }
+  @media (max-width: 1239px) { .cf-pop, .cf-pop.cf-open { transform: translateX(-50%) !important; } }
+  .cf-seg-ind, .cf-btn, .cf-dk-btn, .cf-pick { transition-property: opacity, background-color, color !important; }
+  .cf-btn:active, .cf-dk-btn:active, .cf-seg:active, .cf-pick:active { transform: none; }
+}
+:focus-visible { outline: 2px solid var(--gold) !important; outline-offset: 2px; }
+.cf-mark { background: var(--gold) !important; border-radius: 6px !important; }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
 <script>window.__COLORS = ["#f2b84b", "#4cc9f0", "#b388ff", "#3ecf8e"]; window.__DATA_URL = '../../data/campaigns.json';</script>
@@ -213,7 +272,7 @@ window.dash = (() => {
 </style>
 
   <div class="cf-dock" role="toolbar" aria-label="Filter and sort campaigns">
-    <div class="cf-dk-seg" role="group" aria-label="Type">
+    <div class="cf-dk-seg" role="group" aria-label="Type"><span class="cf-seg-ind" aria-hidden="true"></span>
       <button type="button" class="cf-seg" data-type="" aria-pressed="true">All</button><button type="button" class="cf-seg" data-type="Clipping" aria-pressed="false">Clipping</button><button type="button" class="cf-seg" data-type="UGC" aria-pressed="false">UGC</button><button type="button" class="cf-seg" data-type="Slideshow" aria-pressed="false">Slideshow</button>
     </div>
     <div class="cf-dk-item"><button type="button" class="cf-dk-btn" data-pop="pop-search" aria-expanded="false"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>Search<span class="cf-badge" data-draw="b-search"></span></button>
@@ -426,7 +485,22 @@ window.dash = (() => {
   }));
   document.querySelectorAll('.cf-pop').forEach((p) => p.addEventListener('click', (e) => e.stopPropagation()));
   document.addEventListener('click', () => closePops());
-  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closePops(); });
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    document.querySelectorAll('.cf-pop.cf-open').forEach((p) => { p.classList.add('cf-instant'); setTimeout(() => p.classList.remove('cf-instant'), 50); });
+    closePops();
+  });
+  // segmented control: move one indicator to the pressed option (transform only)
+  const segInd = document.querySelector('.cf-seg-ind');
+  const moveInd = (instant) => {
+    const on = document.querySelector('.cf-seg[aria-pressed="true"]'); if (!segInd || !on) return;
+    if (instant) segInd.classList.add('cf-instant');
+    segInd.style.width = on.offsetWidth + 'px'; segInd.style.transform = `translateX(${on.offsetLeft - 3}px)`;
+    if (instant) requestAnimationFrame(() => requestAnimationFrame(() => segInd.classList.remove('cf-instant')));
+  };
+  document.querySelectorAll('.cf-seg').forEach((b) => b.addEventListener('click', () => requestAnimationFrame(() => moveInd(false))));
+  window.addEventListener('resize', () => moveInd(true));
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => moveInd(true)); else moveInd(true);
   const qBox = $('f-q'); if (qBox) qBox.addEventListener('keydown', (e) => { if (e.key === 'Escape') e.preventDefault(); }); // Esc closes the menu, keeps the search text
   const after = () => { CF.limit = 100; window.CF_sync(); window.CF_redraw(); };
   document.querySelectorAll('.cf-seg').forEach((b) => b.addEventListener('click', () => { CF.type = b.dataset.type; after(); }));
@@ -486,8 +560,9 @@ window.dash = (() => {
     const v = view(); if (!v) { el.textContent = '—'; return; }
     const top = v.filter((r) => r.paid > 0 && r.creators >= 3).sort((a, b) => b.left_per_creator - a.left_per_creator).slice(0, 3);
     if (!top.length) { const p = document.createElement('p'); p.className = 'cf-hint'; p.textContent = 'No paying campaign matches these filters.'; el.append(p); return; }
+    const first = !window.__picksShown; window.__picksShown = true;
     top.forEach((r, i) => {
-      const a = document.createElement('a'); a.className = 'cf-pick'; a.href = r.url; a.target = '_blank'; a.rel = 'noopener';
+      const a = document.createElement('a'); a.className = 'cf-pick' + (first ? ' cf-enter cf-enter-' + i : ''); a.href = r.url; a.target = '_blank'; a.rel = 'noopener';
       const rank = document.createElement('span'); rank.className = 'cf-pick-rank'; rank.textContent = '#' + (i + 1);
       const t = document.createElement('span'); t.className = 'cf-pick-title'; t.textContent = r.campaign;
       const o = document.createElement('span'); o.className = 'cf-pick-org'; o.textContent = `${r.org} · ${r.category}`;
@@ -584,6 +659,7 @@ window.dash = (() => {
       .attr('cx', (r) => x(r.creators + 1)).attr('cy', (r) => y(r.left + 1)).attr('r', (r) => rr(r.per_post ? 1 : r.rate))
       .style('fill', (r) => col[r.type] || dash.colors[0]).classed('cf-out', (r) => !inB(r, window.CF.brush));
     const tip = d3.select(el).append('div').attr('class', 'cf-tip').style('opacity', 0);
+    let tipOpen = false;
     const brush = d3.brush().extent([[m.l, m.t], [W - m.r, H - m.b]])
       .on('end', (ev) => {
         if (!ev.sourceEvent) return;
@@ -600,12 +676,13 @@ window.dash = (() => {
     if (window.CF.brush) { const b = window.CF.brush; bg.call(brush.move, [[x(b.x0), y(b.y1)], [x(b.x1), y(b.y0)]]); }
     dots.raise().on('mousemove', (ev, r) => {
       const [px, py] = d3.pointer(ev, el);
+      tip.classed('cf-instant', tipOpen); tipOpen = true;
       tip.style('opacity', 1).style('left', Math.min(px + 12, el.clientWidth - 270) + 'px').style('top', (py + 12) + 'px').replaceChildren();
       tip.append('b').text(r.campaign);
       tip.append('div').text(`${r.org} · ${r.type}`);
       tip.append('div').text(`${F.money(r.left)} left of ${F.money(r.budget)} · ${F.int(r.creators)} creators`);
       tip.append('div').text(`${r.per_post ? 'paid per post' : F.rate(r.rate) + ' per 1K'}${r.max_payout != null ? ' · max ' + F.money(r.max_payout) : ''}`);
-    }).on('mouseleave', () => tip.style('opacity', 0))
+    }).on('mouseleave', () => { tip.style('opacity', 0); setTimeout(() => { tipOpen = false; }, 300); })
       .on('click', (ev, r) => window.open(r.url, '_blank', 'noopener'));
   });
 
