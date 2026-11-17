@@ -3,17 +3,17 @@
 <meta name="description" content="Every Content Rewards campaign, refreshed every 4 hours: budget left, creators, pay rates.">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&family=IBM+Plex+Mono:wght@500;600&display=swap">
 <style>
-#dash-root { max-width: 1280px; margin: 0 auto; padding-block: 0 48px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+#dash-root { max-width: 1480px; margin: 0 auto; padding-block: 0 48px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
 body { margin: 0; background: var(--color-bg); color: var(--color-fg); font: 14px/1.45 var(--font-anthropic-sans); }
 .dash-select { font: inherit; color: var(--color-fg); background-color: var(--color-bg); border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); padding: 6px 8px; }
 :root { --cds-font-size-caption:12.5px; --cds-font-size-body:14px; --cds-font-size-heading:17px; --cds-font-size-title:34px; --cds-font-weight-medium:600;
   --cds-gap-xs:4px; --cds-gap-sm:8px; --cds-gap-md:14px; --cds-gap-lg:22px; --cds-pad-lg:18px; }
-.cf-hero { margin: 0 calc(-1 * max(16px, env(safe-area-inset-left, 0px))); padding: 34px max(16px, env(safe-area-inset-left, 0px)) 30px; }
+.cf-hero { margin-top: 16px; padding: 30px 28px 26px; border-radius: var(--cds-radius); }
 
 :root { color-scheme: dark; --color-fg:#e8eef7; --color-fg-muted:#8a9bb4; --color-bg:#0a1220; --color-panel:#101b2d; --color-border-line:#1e2b42;
   --color-ok:#3ecf8e; --color-warn:#f2b84b; --color-bad:#ff6b6b; --font-anthropic-sans: Manrope, system-ui, sans-serif; --font-anthropic-serif: 'IBM Plex Mono', ui-monospace, monospace;
   --cds-radius:12px; --cds-chart-grid:#18243a; --cds-chart-axis:#2a3a56; --cds-text-secondary:#8a9bb4; --cds-surface-popover:#15233a; --cds-border:#2a3a56; --cds-shadow-popover:0 10px 30px rgba(0,0,0,.45); }
-.cf-hero { background: radial-gradient(900px 300px at 10% 0%, rgba(242,184,75,.16), transparent 60%), linear-gradient(180deg, #0e1a2e, #0a1220); border-bottom: 1px solid #1e2b42; }
+.cf-hero { background: radial-gradient(900px 300px at 10% 0%, rgba(242,184,75,.16), transparent 60%), linear-gradient(180deg, #0e1a2e, #0a1220); border: 1px solid #1e2b42; }
 .cf-hero h1 { font-family: Manrope, sans-serif !important; font-weight: 800 !important; letter-spacing: -.02em; font-size: 40px !important; }
 .cf-eyebrow { color: #f2b84b !important; }
 .cf-take b { color: #f2b84b !important; }
@@ -135,22 +135,41 @@ window.dash = (() => {
   .cf-plat-facebook { background: #1877f2; } .cf-plat-snapchat { background: #f7d900; color: #111; }
   .cf-ratecell { font-weight: var(--cds-font-weight-medium); }
   .cf-rate-hi { color: var(--color-ok); } .cf-rate-lo { color: var(--color-fg-muted); }
+  .cf-shell { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--cds-gap-lg); align-items: start; }
+  .cf-side { display: grid; gap: var(--cds-gap-md); background: var(--color-panel); border: 1px solid var(--color-border-line); border-radius: var(--cds-radius);
+    padding: var(--cds-pad-lg); margin-top: 16px; min-width: 0; }
+  .cf-brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 16px; letter-spacing: -.01em; }
+  .cf-mark { width: 22px; height: 22px; border-radius: 7px; background: conic-gradient(from 200deg, var(--cf-c0, #3d6fd9), var(--cf-c1, #d9733d), var(--cf-c2, #3da67a), var(--cf-c0, #3d6fd9)); }
+  .cf-nav { display: grid; gap: 2px; }
+  .cf-nav a { color: var(--color-fg-muted); text-decoration: none; padding: 7px 10px; border-radius: calc(var(--cds-radius) * .6); font-size: 13.5px; }
+  .cf-nav a:hover { color: var(--color-fg); background: var(--color-bg); }
+  .cf-nav a.cf-active { color: var(--color-fg); background: var(--color-bg); font-weight: 600; box-shadow: inset 3px 0 0 var(--cf-c0, currentColor); }
+  .cf-sidebox > summary { cursor: pointer; font-weight: 600; padding: 8px 0; list-style: none; display: flex; justify-content: space-between; }
+  .cf-sidebox > summary::after { content: "Show"; font-weight: 400; color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); }
+  .cf-sidebox[open] > summary::after { content: "Hide"; }
+  .cf-side .cf-filters { gap: var(--cds-gap-md); }
+  .cf-side .cf-row { flex-direction: column; align-items: stretch; gap: var(--cds-gap-sm); }
+  .cf-side .cf-field input[type=number], .cf-side .cf-field input[type=search], .cf-side .dash-select { width: 100%; box-sizing: border-box; }
+  .cf-side .cf-checks { gap: 6px; }
+  .cf-side .cf-btn#f-reset { justify-self: start; }
+  .cf-sidefoot { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); margin: 0; border-top: 1px solid var(--color-border-line); padding-top: var(--cds-gap-sm); }
+  @media (min-width: 1000px) {
+    .cf-shell { grid-template-columns: 290px minmax(0, 1fr); }
+    .cf-side { position: sticky; top: 16px; max-height: calc(100vh - 32px); overflow-y: auto; }
+    .cf-sidebox > summary { display: none; }
+  }
+  @media (max-width: 999px) { .cf-nav { display: flex; flex-wrap: wrap; gap: 4px; } .cf-nav a { background: var(--color-bg); } }
 </style>
 
-<div class="cf" data-source="campaigns">
-  <header class="cf-head cf-hero" id="top">
-    <p class="cf-eyebrow">Content Rewards · refreshed every 4 hours</p>
-    <h1>Campaign Finder</h1>
-    <p class="cf-take" data-read lang="en"><b data-draw="t-count">—</b> campaigns match your filters, with <b data-draw="t-left">—</b> still unspent. Most budget per creator: <b data-draw="t-best">—</b>.</p>
-    <p class="cf-hint" data-draw="t-updated">—</p>
-  </header>
-
-  <section class="cf-picks" id="picks">
-    <div class="cf-sechead"><h2>Best picks right now</h2><p class="cf-hint">Most budget per creator among campaigns already paying out, with 3+ creators, under your filters.</p></div>
-    <div class="cf-pickgrid" data-draw="picks" data-source="campaigns"></div>
-  </section>
-
-  <section class="cf-panel cf-filters" id="filters" aria-label="Filters">
+<div class="cf-shell">
+  <aside class="cf-side" aria-label="Sections and filters">
+    <div class="cf-brand"><span class="cf-mark" aria-hidden="true"></span>Campaign Finder</div>
+    <nav class="cf-nav" aria-label="Sections">
+      <a href="#picks">Best picks</a><a href="#kpis">Overview</a><a href="#map">Budget vs competition</a><a href="#cats">Categories</a><a href="#list">All campaigns</a>
+    </nav>
+    <details class="cf-sidebox" id="side-filters" open>
+      <summary>Filters</summary>
+  <section class="cf-filters" id="filters" aria-label="Filters">
     <div class="cf-row">
       <label class="cf-field">Search campaign or brand<input type="search" id="f-q" placeholder="e.g. podcast, Reach, faith"></label>
       <label class="cf-field">Type
@@ -198,6 +217,23 @@ window.dash = (() => {
       <button type="button" class="cf-btn" id="f-reset">Reset filters</button>
     </div>
   </section>
+    </details>
+    <p class="cf-sidefoot" data-draw="side-updated">—</p>
+  </aside>
+<div class="cf" data-source="campaigns">
+  <header class="cf-head cf-hero" id="top">
+    <p class="cf-eyebrow">Content Rewards · refreshed every 4 hours</p>
+    <h1>Campaign Finder</h1>
+    <p class="cf-take" data-read lang="en"><b data-draw="t-count">—</b> campaigns match your filters, with <b data-draw="t-left">—</b> still unspent. Most budget per creator: <b data-draw="t-best">—</b>.</p>
+    <p class="cf-hint" data-draw="t-updated">—</p>
+  </header>
+
+  <section class="cf-picks" id="picks">
+    <div class="cf-sechead"><h2>Best picks right now</h2><p class="cf-hint">Most budget per creator among campaigns already paying out, with 3+ creators, under your filters.</p></div>
+    <div class="cf-pickgrid" data-draw="picks" data-source="campaigns"></div>
+  </section>
+
+
 
   <section class="cf-kpis" id="kpis" aria-label="Summary">
     <div class="cf-panel cf-kpi"><div class="cf-k">Matching campaigns</div><div class="cf-v" data-draw="k-count">—</div><div class="cf-s" data-draw="k-count-s">—</div></div>
@@ -254,6 +290,7 @@ window.dash = (() => {
     <p>"Left / creator" is budget left divided by the number of creators who have joined. It is a rough measure of competition, not a forecast of earnings. "Spent / day" is how much the campaign paid out over roughly the last 24 hours. "New" means it launched or first appeared in the last 3 days. The casino, regional, on-camera and US-audience flags are keyword guesses from the title, description and visible rules. Most audience rules are hidden until you join, so check them before posting.</p>
   </details>
 </div>
+</div>
 
 <script>
   // ---------- shared filter state ----------
@@ -262,7 +299,7 @@ window.dash = (() => {
     hideGamb: true, hideNonEn: true, hideFace: true, paying: false, podcast: false, cpm: false,
     brush: null, sort: 'left_per_creator', limit: 100,
   };
-  window.CF_redraw = (except) => ['picks', 't-updated', 't-count', 't-left', 't-best', 'k-count', 'k-count-s', 'k-left', 'k-left-s', 'k-rate', 'k-cr', 'scatter', 'bars', 'rows', 'shown', 'cat-select']
+  window.CF_redraw = (except) => ['picks', 'side-updated', 't-updated', 't-count', 't-left', 't-best', 'k-count', 'k-count-s', 'k-left', 'k-left-s', 'k-rate', 'k-cr', 'scatter', 'bars', 'rows', 'shown', 'cat-select']
     .filter((n) => n !== except).forEach((n) => dash.draw(n));
   window.CF_rows = () => { const d = dash.data('campaigns'); return d.status === 'ok' ? d.data : null; };
   // skip: 'cat' (bars), 'brush' (scatter) for cross-filtering
@@ -342,8 +379,15 @@ window.dash = (() => {
     document.querySelectorAll('.f-plat').forEach((c) => (c.checked = false));
     window.CF_redraw();
   });
+  const sideF = $('side-filters'); if (sideF && window.matchMedia) sideF.open = matchMedia('(min-width: 1000px)').matches;
+  const navLinks = [...document.querySelectorAll('.cf-nav a')];
+  if ('IntersectionObserver' in window && navLinks.length) {
+    const io = new IntersectionObserver((ents) => ents.forEach((e) => { if (e.isIntersecting) navLinks.forEach((a) => a.classList.toggle('cf-active', a.getAttribute('href') === '#' + e.target.id)); }),
+      { root: document, rootMargin: '-30% 0px -60% 0px' });
+    navLinks.forEach((a) => { const t = document.getElementById(a.getAttribute('href').slice(1)); if (t) io.observe(t); });
+  }
   // series colours as CSS variables for the legend
-  document.querySelectorAll('.cf').forEach((el) => { (dash.colors || []).slice(0, 3).forEach((c, i) => el.style.setProperty(`--cf-c${i}`, c)); });
+  document.querySelectorAll('.cf, .cf-side').forEach((el) => { (dash.colors || []).slice(0, 3).forEach((c, i) => el.style.setProperty(`--cf-c${i}`, c)); });
 </script>
 
 <script>
@@ -363,6 +407,11 @@ window.dash = (() => {
     const m = (window.__META || {}); if (!m.updated) return T(el, '—');
     const h = (Date.now() - Date.parse(m.updated)) / 36e5;
     T(el, `Updated ${h < 1 ? Math.max(1, Math.round(h * 60)) + ' min' : Math.round(h) + ' h'} ago (${new Date(m.updated).toLocaleString()}). Refreshes every 4 hours.`);
+  });
+  dash.draw('side-updated', (el) => {
+    const m = (window.__META || {}); if (!m.updated) return T(el, '—');
+    const h = (Date.now() - Date.parse(m.updated)) / 36e5;
+    T(el, `Data updated ${h < 1 ? Math.max(1, Math.round(h * 60)) + ' min' : Math.round(h) + ' h'} ago · refreshes every 4 hours`);
   });
   dash.draw('k-count', (el) => { const v = view(); T(el, v ? F.int(v.length) : '—'); });
   dash.draw('k-count-s', (el) => { const r = window.CF_rows(); T(el, r ? `of ${F.int(r.length)} listed` : '—'); });

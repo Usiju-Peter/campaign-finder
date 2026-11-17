@@ -5,12 +5,12 @@ ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
 page = open(os.path.join(ROOT, "scraper", "page.html"), encoding="utf-8").read()
 
 BASE = """
-#dash-root { max-width: 1280px; margin: 0 auto; padding-block: 0 48px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+#dash-root { max-width: 1480px; margin: 0 auto; padding-block: 0 48px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
 body { margin: 0; background: var(--color-bg); color: var(--color-fg); font: 14px/1.45 var(--font-anthropic-sans); }
 .dash-select { font: inherit; color: var(--color-fg); background-color: var(--color-bg); border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); padding: 6px 8px; }
 :root { --cds-font-size-caption:12.5px; --cds-font-size-body:14px; --cds-font-size-heading:17px; --cds-font-size-title:34px; --cds-font-weight-medium:600;
   --cds-gap-xs:4px; --cds-gap-sm:8px; --cds-gap-md:14px; --cds-gap-lg:22px; --cds-pad-lg:18px; }
-.cf-hero { margin: 0 calc(-1 * max(16px, env(safe-area-inset-left, 0px))); padding: 34px max(16px, env(safe-area-inset-left, 0px)) 30px; }
+.cf-hero { margin-top: 16px; padding: 30px 28px 26px; border-radius: var(--cds-radius); }
 """
 
 LOOKS = {
@@ -19,7 +19,7 @@ LOOKS = {
 :root { color-scheme: dark; --color-fg:#e8eef7; --color-fg-muted:#8a9bb4; --color-bg:#0a1220; --color-panel:#101b2d; --color-border-line:#1e2b42;
   --color-ok:#3ecf8e; --color-warn:#f2b84b; --color-bad:#ff6b6b; --font-anthropic-sans: Manrope, system-ui, sans-serif; --font-anthropic-serif: 'IBM Plex Mono', ui-monospace, monospace;
   --cds-radius:12px; --cds-chart-grid:#18243a; --cds-chart-axis:#2a3a56; --cds-text-secondary:#8a9bb4; --cds-surface-popover:#15233a; --cds-border:#2a3a56; --cds-shadow-popover:0 10px 30px rgba(0,0,0,.45); }
-.cf-hero { background: radial-gradient(900px 300px at 10% 0%, rgba(242,184,75,.16), transparent 60%), linear-gradient(180deg, #0e1a2e, #0a1220); border-bottom: 1px solid #1e2b42; }
+.cf-hero { background: radial-gradient(900px 300px at 10% 0%, rgba(242,184,75,.16), transparent 60%), linear-gradient(180deg, #0e1a2e, #0a1220); border: 1px solid #1e2b42; }
 .cf-hero h1 { font-family: Manrope, sans-serif !important; font-weight: 800 !important; letter-spacing: -.02em; font-size: 40px !important; }
 .cf-eyebrow { color: #f2b84b !important; }
 .cf-take b { color: #f2b84b !important; }
@@ -41,7 +41,7 @@ LOOKS = {
   --cds-radius:18px; --cds-chart-grid:#efedf9; --cds-chart-axis:#d9d4ef; --cds-text-secondary:#6b6488; --cds-surface-popover:#fff; --cds-border:#e7e3f7; --cds-shadow-popover:0 12px 30px rgba(60,30,140,.16); }
 .cf-hero { background-color: #6c3cf4; color: #fff;
   background-image: linear-gradient(rgba(255,255,255,.07) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.07) 1px, transparent 1px); background-size: 28px 28px;
-  border-radius: 0 0 28px 28px; }
+  }
 .cf-hero h1 { font-family: 'Space Grotesk', sans-serif !important; font-weight: 700 !important; font-size: 44px !important; letter-spacing: -.03em; color: #fff; }
 .cf-hero .cf-eyebrow { color: #ffd2dc !important; } .cf-hero .cf-take, .cf-hero .cf-hint { color: #e4dcff !important; } .cf-hero .cf-take b { color: #fff !important; }
 .cf-panel, .cf-pick { box-shadow: 0 2px 0 #e7e3f7, 0 10px 24px rgba(60,30,140,.06); border-color: transparent !important; }
@@ -64,7 +64,7 @@ LOOKS = {
   --color-border-line:#26332d; --cds-chart-grid:#1c2622; --cds-chart-axis:#33423b; --cds-text-secondary:#9aaba2; --cds-surface-popover:#1a2420; --cds-border:#26332d; } }
 :root[data-theme="dark"] { color-scheme: dark; --color-fg:#e6eee9; --color-fg-muted:#9aaba2; --color-bg:#0f1613; --color-panel:#151e1a;
   --color-border-line:#26332d; --cds-chart-grid:#1c2622; --cds-chart-axis:#33423b; --cds-text-secondary:#9aaba2; --cds-surface-popover:#1a2420; --cds-border:#26332d; }
-.cf-hero { border-bottom: 3px double var(--color-border-line); }
+.cf-hero { border: 1px solid var(--color-border-line); border-bottom: 3px double var(--color-border-line); background: var(--color-panel); }
 .cf-hero h1 { font-size: 52px !important; letter-spacing: -.01em; }
 .cf-eyebrow { color: var(--color-ok) !important; font-weight: 600; }
 .cf-panel, .cf-pick { box-shadow: none; }
