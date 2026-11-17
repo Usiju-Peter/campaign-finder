@@ -334,6 +334,37 @@
     th .caret { display: none; } th[aria-sort] .caret { display: inline; }
     .pager { justify-content: center; } .pg-note { display: none; }
   }
+
+  /* ---- phones: quick filters on the page, complete table with frozen name column ---- */
+  .m-quick { display: none; }
+  @media (max-width: 680px) {
+    .m-quick { display: flex; gap: 6px; align-items: center; overflow-x: auto; padding: 10px; border-bottom: 1px solid var(--line); scrollbar-width: none; scroll-snap-type: x proximity; }
+    .m-quick::-webkit-scrollbar { display: none; }
+    .m-quick .chip { flex: none; height: 32px; scroll-snap-align: start; }
+    .mq-label { flex: none; font-size: 11.5px; color: var(--text-3); margin-right: 2px; }
+    .mq-sep { flex: none; width: 1px; height: 22px; background: var(--line); margin: 0 4px; }
+    .toolbar .open-filters { flex: 1 1 0; }
+    /* the full table: swipe sideways, # and Campaign stay put, columns snap */
+    .card.results > .scroll { overflow-x: auto !important; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; scroll-padding-left: 202px; -webkit-overflow-scrolling: touch; }
+    th:first-child, td.rank, th[data-k="campaign"], td.name { scroll-snap-align: none !important; }
+    th[data-k="platforms"] { scroll-snap-align: start; }
+    table { table-layout: auto !important; min-width: 720px; }
+    td.pays, th[data-k="platforms"], td.hide-m, th[data-k="paid"], th[data-k="age_days"] { display: table-cell !important; }
+    td .sub.m-only { display: none !important; }
+    td.name .m-plats { display: none !important; }
+    th, td { padding: 11px 10px !important; scroll-snap-align: start; }
+    thead th { position: static !important; }
+    th:first-child, td.rank { position: sticky !important; left: 0; z-index: 2; width: 30px; min-width: 30px; background: var(--surface); }
+    th[data-k="campaign"], td.name { position: sticky !important; left: 30px; z-index: 2; background: var(--surface); width: 172px !important; min-width: 172px !important; max-width: 172px !important;
+      box-shadow: 1px 0 0 var(--line), 8px 0 12px -10px rgba(0, 0, 0, .25); }
+    thead th:first-child, thead th[data-k="campaign"] { background: var(--raised); z-index: 3; }
+    :root[data-theme="dark"] thead th:first-child, :root[data-theme="dark"] thead th[data-k="campaign"] { background: var(--surface); }
+    tbody tr:hover td.rank, tbody tr:hover td.name { background: var(--hover); }
+    td.name .meta { white-space: normal !important; }
+    th[data-k="rate"], td[data-l="Pay / 1K"], th[data-k="budget"], td[data-l="Total budget"], th[data-k="creators"], td[data-l="Creators"] { width: auto !important; }
+    .swipe-hint { display: block; }
+  }
+  .swipe-hint { display: none; padding: 8px 12px 0; color: var(--text-3); font-size: 12px; }
   @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
 </head>
@@ -397,14 +428,16 @@
           <input id="q" type="search" placeholder="Search campaigns or brands" autocomplete="off" spellcheck="false" aria-label="Search campaigns or brands">
           <button class="x" id="clear-q" type="button" aria-label="Clear search" hidden><svg class="ico"><use href="#i-x"/></svg></button>
         </label>
-        <button class="iconbtn open-filters" id="open-filters-2" type="button"><svg class="ico"><use href="#i-filter"/></svg>Filters <em id="open-n-2"></em></button>
+        <button class="iconbtn open-filters" id="open-filters-2" type="button"><svg class="ico"><use href="#i-filter"/></svg>All filters <em id="open-n-2"></em></button>
         <div class="dd" id="dd-sort"></div>
       </div>
+      <div class="m-quick" id="m-quick" aria-label="Quick filters"></div>
       <div class="toolbar toolbar-2">
         <div class="ranges"><div class="dd rng" id="dd-minLeft"></div><div class="dd rng" id="dd-maxCr"></div><div class="dd rng" id="dd-minRate"></div></div>
         <div class="resinfo"><span id="range" role="status" aria-live="polite"></span><div class="dd" id="dd-size"></div></div>
       </div>
       <div class="active" id="active" aria-label="Active filters"></div>
+      <p class="swipe-hint">Swipe the table sideways to see every column</p>
       <div class="scroll"><table><thead><tr id="head"></tr></thead><tbody id="rows"></tbody></table></div>
       <nav class="pager" aria-label="Pages">
         <span class="pg-note" id="pg-note"></span>
@@ -548,6 +581,13 @@
     SEC.types.val.textContent = S.types.length ? S.types.join(', ') : 'All'; SEC.types.val.classList.toggle('on', !!S.types.length);
     SEC.plats.body.replaceChildren(...PLATS.map((p) => chip(p, S.plats.includes(p), countIf('plats', (r) => (r.platforms || '').split(', ').includes(p)), () => { S.plats = S.plats.includes(p) ? S.plats.filter((x) => x !== p) : [...S.plats, p]; go(); }, 'p-' + p)));
     SEC.plats.val.textContent = S.plats.length ? `${S.plats.length} selected` : 'Any'; SEC.plats.val.classList.toggle('on', !!S.plats.length);
+    const mq = $('m-quick');
+    if (mq) {
+      const q = [el('span', { class: 'mq-label', text: 'Type' }), ...TYPES.map((t) => chip(t, S.types.includes(t), countIf('types', (r) => r.type === t), () => { S.types = S.types.includes(t) ? S.types.filter((x) => x !== t) : [...S.types, t]; go(); })),
+        el('span', { class: 'mq-sep' }), el('span', { class: 'mq-label', text: 'Pays on' }),
+        ...PLATS.map((p) => chip(p, S.plats.includes(p), countIf('plats', (r) => (r.platforms || '').split(', ').includes(p)), () => { S.plats = S.plats.includes(p) ? S.plats.filter((x) => x !== p) : [...S.plats, p]; go(); }, 'p-' + p))];
+      const keep = mq.scrollLeft; mq.replaceChildren(...q); mq.scrollLeft = keep;
+    }
     paintCats();
     SEC.cats.val.textContent = S.cats.length ? (S.cats.length === 1 ? S.cats[0] : `${S.cats.length} selected`) : 'All'; SEC.cats.val.classList.toggle('on', !!S.cats.length);
     TOGGLES.forEach(([k]) => { $('t-' + k).checked = S[k]; });
