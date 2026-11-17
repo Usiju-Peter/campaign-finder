@@ -1,0 +1,639 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Campaign Finder · Vercel Web Design Guidelines</title>
+<meta name="description" content="Every Content Rewards campaign, refreshed every 4 hours. Design pass: Vercel Web Design Guidelines.">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+#dash-root { max-width: 1480px; margin: 0 auto; padding-block: 0 48px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+body { margin: 0; background: var(--color-bg); color: var(--color-fg); font: 14px/1.45 var(--font-anthropic-sans); }
+.dash-select { font: inherit; color: var(--color-fg); background-color: var(--color-bg); border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); padding: 6px 8px; }
+:root { --cds-font-size-caption:12.5px; --cds-font-size-body:14px; --cds-font-size-heading:17px; --cds-font-size-title:34px; --cds-font-weight-medium:600;
+  --cds-gap-xs:4px; --cds-gap-sm:8px; --cds-gap-md:14px; --cds-gap-lg:22px; --cds-pad-lg:18px; }
+.cf-hero { margin-top: 16px; padding: 30px 28px 26px; border-radius: var(--cds-radius); }
+
+:root { color-scheme: dark; --color-fg:#e8eef7; --color-fg-muted:#8a9bb4; --color-bg:#0a1220; --color-panel:#101b2d; --color-border-line:#1e2b42;
+  --color-ok:#3ecf8e; --color-warn:#f2b84b; --color-bad:#ff6b6b; --font-anthropic-sans: Manrope, system-ui, sans-serif; --font-anthropic-serif: 'IBM Plex Mono', ui-monospace, monospace;
+  --cds-radius:12px; --cds-chart-grid:#18243a; --cds-chart-axis:#2a3a56; --cds-text-secondary:#8a9bb4; --cds-surface-popover:#15233a; --cds-border:#2a3a56; --cds-shadow-popover:0 10px 30px rgba(0,0,0,.45); }
+.cf-hero { background: radial-gradient(900px 300px at 10% 0%, rgba(242,184,75,.16), transparent 60%), linear-gradient(180deg, #0e1a2e, #0a1220); border: 1px solid #1e2b42; }
+.cf-hero h1 { font-family: Manrope, sans-serif !important; font-weight: 800 !important; letter-spacing: -.02em; font-size: 40px !important; }
+.cf-eyebrow { color: #f2b84b !important; }
+.cf-take b { color: #f2b84b !important; }
+.cf-kpi .cf-v, .cf-pick-big { color: #f2b84b; font-weight: 600; }
+.cf-kpi { border-top: 2px solid #f2b84b !important; }
+.cf-pick { background: linear-gradient(180deg, #13223a, #101b2d) !important; }
+.cf-pick:hover { box-shadow: 0 10px 30px rgba(0,0,0,.4), 0 0 0 1px #f2b84b55; }
+.cf-pick-bar i { background: linear-gradient(90deg, #f2b84b, #3ecf8e) !important; }
+.cf-table th { text-transform: uppercase; letter-spacing: .06em; font-size: 10.5px; }
+.cf-table td { font-family: 'IBM Plex Mono', monospace; font-size: 12px; }
+.cf-table td:first-child { font-family: Manrope, sans-serif; font-size: 13px; }
+.cf-chip:has(input:checked) { border-color: #f2b84b; color: #f2b84b; }
+.cf-plat-tiktok, .cf-plat-x { background: #2b3a55; }
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script>window.__COLORS = ["#f2b84b", "#4cc9f0", "#b388ff", "#3ecf8e"]; window.__DATA_URL = '../../data/campaigns.json';</script>
+<script>// Minimal stand-in for the dashboard runtime: loads the data file and reruns every drawing.
+window.dash = (() => {
+  const data = { campaigns: { status: 'loading', data: [], message: '', refreshing: false, truncated: false, meta: [] } };
+  const draws = new Map();
+  const run = (name) => document.querySelectorAll(`[data-draw="${name}"]`).forEach((el) => { try { draws.get(name)(el); } catch (e) { console.error(name, e); } });
+  let started = false;
+  const all = () => draws.forEach((_, n) => run(n));
+  window.addEventListener('DOMContentLoaded', () => {
+    started = true; all();
+    fetch(window.__DATA_URL || 'data/campaigns.json', { cache: 'no-store' }).then((r) => r.json()).then((j) => {
+      window.__META = j.meta; data.campaigns = { status: 'ok', data: j.rows, message: '', refreshing: false, truncated: false, meta: [] }; all();
+    }).catch((e) => { data.campaigns = { status: 'error', data: [], message: String(e) }; all(); });
+  });
+  let w = 0; window.addEventListener('resize', () => { if (Math.abs(innerWidth - w) > 20) { w = innerWidth; all(); } });
+  return {
+    colors: window.__COLORS || ['#3d6fd9', '#d9733d', '#3da67a', '#a65dd1'],
+    data: (id) => data[id] || { status: 'missing', data: [] },
+    onData: (fn) => fn(),
+    draw: (name, fn) => { if (fn) { draws.set(name, fn); if (started) run(name); } else if (draws.has(name)) run(name); },
+    params: () => ({}), setParams: () => {}, resetParams: () => {}, setLink: () => {}, refresh: () => {},
+  };
+})();
+</script>
+</head><body><div id="dash-root">
+<style>
+  .cf { display: grid; gap: var(--cds-gap-lg); min-width: 0; }
+  .cf > *, .cf-charts > *, .cf-kpis > * { min-width: 0; }
+  .cf-head h1 { font-family: var(--font-anthropic-serif); font-weight: 400; font-size: var(--cds-font-size-title); margin: 0; }
+  .cf-take { color: var(--color-fg-muted); margin: var(--cds-gap-xs) 0 0; max-width: 70ch; line-height: 1.5; }
+  .cf-take b { color: var(--color-fg); font-weight: var(--cds-font-weight-medium); }
+  .cf-panel { background: var(--color-panel); border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); padding: var(--cds-pad-lg); }
+  .cf-filters { display: grid; gap: var(--cds-gap-md); }
+  .cf-row { display: flex; flex-wrap: wrap; gap: var(--cds-gap-md); align-items: flex-end; }
+  .cf-field { display: grid; gap: 4px; font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
+  .cf-field input[type=number], .cf-field input[type=search] { font: inherit; font-size: var(--cds-font-size-body); color: var(--color-fg); background: var(--color-bg);
+    border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); padding: 6px 8px; width: 8.5em; }
+  .cf-field input[type=search] { width: 16em; max-width: 100%; }
+  .cf-checks { display: flex; flex-wrap: wrap; gap: var(--cds-gap-sm); }
+  .cf-chip { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--color-border-line); border-radius: 999px; padding: 4px 10px;
+    font-size: var(--cds-font-size-caption); color: var(--color-fg); cursor: pointer; user-select: none; background: var(--color-bg); }
+  .cf-chip input { margin: 0; accent-color: var(--color-fg); }
+  .cf-btn { font: inherit; font-size: var(--cds-font-size-caption); color: var(--color-fg); background: var(--color-bg); border: 1px solid var(--color-border-line);
+    border-radius: var(--cds-radius); padding: 6px 12px; cursor: pointer; }
+  .cf-btn:hover { background: var(--color-panel); }
+  .cf-btn:focus-visible, .cf-chip:focus-within, .cf-field input:focus-visible, .cf-th:focus-visible { outline: 2px solid var(--color-fg); outline-offset: 2px; }
+  .cf-kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: var(--cds-gap-md); }
+  .cf-kpi .cf-k { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
+  .cf-kpi .cf-v { font-family: var(--font-anthropic-serif); font-size: var(--cds-font-size-title); font-variant-numeric: tabular-nums; margin-top: 4px; }
+  .cf-kpi .cf-s { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); margin-top: 2px; }
+  .cf-charts { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: var(--cds-gap-md); }
+  .cf-charts h2, .cf-tablehead h2 { font-size: var(--cds-font-size-heading); font-weight: var(--cds-font-weight-medium); margin: 0 0 2px; }
+  .cf-hint { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); margin: 0 0 var(--cds-gap-sm); }
+  .cf-chart { position: relative; min-height: 320px; }
+  .cf-chart svg text { fill: var(--cds-text-secondary); font-size: var(--cds-font-size-caption); }
+  .cf-chart .domain, .cf-chart .tick line { stroke: var(--cds-chart-axis); }
+  .cf-chart .cf-grid line { stroke: var(--cds-chart-grid); }
+  .cf-dot { stroke: var(--color-bg); stroke-width: 1; cursor: pointer; }
+  .cf-dot.cf-out { opacity: .15; }
+  .cf-bar { cursor: pointer; }
+  .cf-bar.cf-dim { opacity: .3; }
+  .cf-tip { position: absolute; pointer-events: none; background: var(--cds-surface-popover); border: 1px solid var(--cds-border); box-shadow: var(--cds-shadow-popover);
+    border-radius: var(--cds-radius); padding: 8px 10px; font-size: var(--cds-font-size-caption); line-height: 1.45; max-width: 260px; z-index: 5; }
+  .cf-tip b { display: block; font-weight: var(--cds-font-weight-medium); margin-bottom: 2px; }
+  .cf-legend { display: flex; gap: var(--cds-gap-md); flex-wrap: wrap; font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); margin-top: 4px; }
+  .cf-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 5px; vertical-align: -1px; }
+  .cf-tablehead { display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: var(--cds-gap-sm); }
+  .cf-tablewrap { overflow-x: auto; }
+  .cf-table { border-collapse: collapse; width: 100%; font-size: var(--cds-font-size-caption); font-variant-numeric: tabular-nums; }
+  .cf-table th, .cf-table td { padding: 7px 8px; border-bottom: 1px solid var(--color-border-line); text-align: right; white-space: nowrap; }
+  .cf-table th:nth-child(-n+3), .cf-table td:nth-child(-n+3) { text-align: left; }
+  .cf-table td:first-child { white-space: normal; min-width: 220px; max-width: 340px; }
+  .cf-th { cursor: pointer; color: var(--color-fg-muted); font-weight: var(--cds-font-weight-medium); }
+  .cf-th.cf-sorted { color: var(--color-fg); }
+  .cf-table a { color: var(--color-fg); text-decoration: none; font-weight: var(--cds-font-weight-medium); }
+  .cf-table a:hover { text-decoration: underline; }
+  .cf-org { color: var(--color-fg-muted); display: block; font-weight: 400; }
+  .cf-pill { display: inline-block; border-radius: 999px; padding: 1px 7px; margin: 0 3px 0 0; font-size: 11px; border: 1px solid var(--color-border-line); color: var(--color-fg-muted); }
+  .cf-pill.cf-bad { color: var(--color-bad); border-color: var(--color-bad); }
+  .cf-pill.cf-warn { color: var(--color-warn); border-color: var(--color-warn); }
+  .cf-pill.cf-ok { color: var(--color-ok); border-color: var(--color-ok); }
+  .cf-table tr.cf-hit td { background: var(--color-panel); }
+  .cf-more { margin-top: var(--cds-gap-sm); }
+  details.cf-notes summary { cursor: pointer; color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); }
+  details.cf-notes p { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); max-width: 75ch; line-height: 1.5; }
+  .cf-eyebrow { text-transform: uppercase; letter-spacing: .12em; font-size: 11px; color: var(--color-fg-muted); margin: 0 0 6px; }
+  .cf-sechead h2 { font-size: var(--cds-font-size-heading); font-weight: var(--cds-font-weight-medium); margin: 0 0 2px; }
+  .cf-pickgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: var(--cds-gap-md); }
+  .cf-pick { display: grid; gap: 4px; text-decoration: none; color: var(--color-fg); background: var(--color-panel); border: 1px solid var(--color-border-line);
+    border-radius: var(--cds-radius); padding: var(--cds-pad-lg); position: relative; transition: transform .15s ease, box-shadow .15s ease; }
+  .cf-pick:hover { transform: translateY(-2px); }
+  .cf-pick:focus-visible { outline: 2px solid var(--color-fg); outline-offset: 2px; }
+  .cf-pick-rank { position: absolute; top: 14px; right: 16px; font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
+  .cf-pick-title { font-weight: var(--cds-font-weight-medium); padding-right: 2.5em; line-height: 1.3; }
+  .cf-pick-org { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
+  .cf-pick-big { font-family: var(--font-anthropic-serif); font-size: 34px; margin-top: 8px; font-variant-numeric: tabular-nums; }
+  .cf-pick-biglabel { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); margin-top: -4px; }
+  .cf-pick-bar { height: 6px; border-radius: 99px; background: var(--color-border-line); overflow: hidden; margin: 8px 0 4px; }
+  .cf-pick-bar i { display: block; height: 100%; background: var(--color-ok); border-radius: 99px; }
+  .cf-pick-meta { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
+  .cf-pick-meta b { color: var(--color-fg); font-weight: var(--cds-font-weight-medium); }
+  .cf-plat { display: inline-block; min-width: 22px; text-align: center; font-size: 10.5px; font-weight: 700; border-radius: 6px; padding: 2px 5px; margin-right: 3px; color: #fff; }
+  .cf-plat-tiktok { background: #111; } .cf-plat-instagram { background: #d6249f; } .cf-plat-youtube { background: #e62117; } .cf-plat-x { background: #333; }
+  .cf-plat-facebook { background: #1877f2; } .cf-plat-snapchat { background: #f7d900; color: #111; }
+  .cf-ratecell { font-weight: var(--cds-font-weight-medium); }
+  .cf-rate-hi { color: var(--color-ok); } .cf-rate-lo { color: var(--color-fg-muted); }
+  .cf-shell { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--cds-gap-lg); align-items: start; }
+  .cf-side { display: grid; gap: var(--cds-gap-md); background: var(--color-panel); border: 1px solid var(--color-border-line); border-radius: var(--cds-radius);
+    padding: var(--cds-pad-lg); margin-top: 16px; min-width: 0; }
+  .cf-brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 16px; letter-spacing: -.01em; }
+  .cf-mark { width: 22px; height: 22px; border-radius: 7px; background: conic-gradient(from 200deg, var(--cf-c0, #3d6fd9), var(--cf-c1, #d9733d), var(--cf-c2, #3da67a), var(--cf-c0, #3d6fd9)); }
+  .cf-nav { display: grid; gap: 2px; }
+  .cf-nav a { color: var(--color-fg-muted); text-decoration: none; padding: 7px 10px; border-radius: calc(var(--cds-radius) * .6); font-size: 13.5px; }
+  .cf-nav a:hover { color: var(--color-fg); background: var(--color-bg); }
+  .cf-nav a.cf-active { color: var(--color-fg); background: var(--color-bg); font-weight: 600; box-shadow: inset 3px 0 0 var(--cf-c0, currentColor); }
+  .cf-sidebox > summary { cursor: pointer; font-weight: 600; padding: 8px 0; list-style: none; display: flex; justify-content: space-between; }
+  .cf-sidebox > summary::after { content: "Show"; font-weight: 400; color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); }
+  .cf-sidebox[open] > summary::after { content: "Hide"; }
+  .cf-side .cf-filters { gap: var(--cds-gap-md); }
+  .cf-side .cf-row { flex-direction: column; align-items: stretch; gap: var(--cds-gap-sm); }
+  .cf-side .cf-field input[type=number], .cf-side .cf-field input[type=search], .cf-side .dash-select { width: 100%; box-sizing: border-box; }
+  .cf-side .cf-checks { gap: 6px; }
+  .cf-side .cf-btn#f-reset { justify-self: start; }
+  .cf-sidefoot { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); margin: 0; border-top: 1px solid var(--color-border-line); padding-top: var(--cds-gap-sm); }
+  @media (min-width: 1000px) {
+    .cf-shell { grid-template-columns: 290px minmax(0, 1fr); }
+    .cf-side { position: sticky; top: 86px; max-height: calc(100vh - 102px); overflow-y: auto; }
+    .cf-sidebox > summary { display: none; }
+  }
+  @media (max-width: 999px) { .cf-nav { display: flex; flex-wrap: wrap; gap: 4px; } .cf-nav a { background: var(--color-bg); } }
+  .cf-dock { position: sticky; top: calc(10px + env(safe-area-inset-top, 0px)); z-index: 50; width: fit-content; margin: 14px auto 0;
+    display: flex; align-items: center; gap: 4px; padding: 6px; max-width: 100%; box-sizing: border-box;
+    background: rgba(14, 14, 20, .92); color: #f2f2f5; border: 1px solid rgba(255,255,255,.08); border-radius: 999px;
+    box-shadow: 0 14px 34px rgba(0,0,0,.28); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); font-size: 14px; }
+  .cf-dock button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+  .cf-dock button:focus-visible { outline: 2px solid #fff; outline-offset: 1px; }
+  .cf-dk-seg { display: flex; background: rgba(255,255,255,.07); border-radius: 999px; padding: 3px; }
+  .cf-seg { padding: 7px 14px; border-radius: 999px; color: #a9a9b6 !important; white-space: nowrap; }
+  .cf-seg[aria-pressed="true"] { background: rgba(255,255,255,.16); color: #fff !important; font-weight: 600; }
+  .cf-dk-item { position: relative; }
+  .cf-dk-btn { display: inline-flex; align-items: center; gap: 7px; padding: 8px 12px; border-radius: 999px; white-space: nowrap; }
+  .cf-dk-btn:hover, .cf-dk-btn[aria-expanded="true"] { background: rgba(255,255,255,.1); }
+  .cf-badge:empty { display: none; }
+  .cf-badge { min-width: 18px; height: 18px; border-radius: 99px; background: var(--cf-c0, #3d6fd9); color: #111; font-size: 11px; font-weight: 700; display: inline-grid; place-items: center; padding: 0 5px; }
+  .cf-dk-plats { display: flex; gap: 2px; padding-left: 4px; }
+  .cf-dk-icon { width: 36px; height: 36px; border-radius: 999px; display: grid; place-items: center; color: #a9a9b6 !important; }
+  .cf-dk-icon:hover { color: #fff !important; background: rgba(255,255,255,.08); }
+  .cf-dk-icon[aria-pressed="true"] { color: #111 !important; background: #fff; }
+  .cf-dk-sep { width: 1px; height: 22px; background: rgba(255,255,255,.15); margin: 0 4px; }
+  .cf-dk-clear { color: #a9a9b6 !important; }
+  .cf-dk-count { padding: 0 12px 0 6px; color: #a9a9b6; font-size: 12.5px; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .cf-pop { position: absolute; top: calc(100% + 12px); left: 0; min-width: 230px; display: none; background: rgba(22,22,30,.98); color: #f2f2f5;
+    border: 1px solid rgba(255,255,255,.1); border-radius: 16px; padding: 12px; box-shadow: 0 18px 40px rgba(0,0,0,.4); max-height: 65vh; overflow-y: auto; }
+  .cf-pop.cf-open { display: block; }
+  .cf-pop-wide { min-width: 320px; }
+  .cf-pop-label { margin: 2px 4px 8px; font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: #8d8d9a; display: block; }
+  .cf-pop-head { display: flex; justify-content: space-between; align-items: baseline; }
+  .cf-link { color: #c9c9d4 !important; font-size: 12.5px !important; text-decoration: underline; }
+  .cf-pop input[type=search] { width: 100%; box-sizing: border-box; font: inherit; color: #fff; background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.12); border-radius: 10px; padding: 9px 11px; }
+  .cf-opts { display: grid; }
+  .cf-opt { text-align: left; padding: 8px 10px !important; border-radius: 9px !important; }
+  .cf-opt:hover { background: rgba(255,255,255,.07) !important; }
+  .cf-opt[aria-pressed="true"] { background: rgba(255,255,255,.12) !important; font-weight: 600; }
+  .cf-opt[aria-pressed="true"]::after { content: " \2713"; }
+  .cf-pop-group + .cf-pop-group { margin-top: 10px; }
+  .cf-presets { display: flex; flex-wrap: wrap; gap: 6px; }
+  .cf-preset { padding: 6px 11px !important; border-radius: 99px !important; border: 1px solid rgba(255,255,255,.14) !important; font-size: 13px !important; }
+  .cf-preset[aria-pressed="true"] { background: #fff !important; color: #111 !important; font-weight: 600; }
+  .cf-tog { display: flex; align-items: center; gap: 10px; padding: 7px 6px; border-radius: 9px; cursor: pointer; }
+  .cf-tog:hover { background: rgba(255,255,255,.06); }
+  .cf-tog input { accent-color: #fff; width: 16px; height: 16px; margin: 0; }
+  .cf-tog em { margin-left: auto; font-style: normal; color: #8d8d9a; font-size: 12px; font-variant-numeric: tabular-nums; }
+  .cf-catlist { display: grid; grid-template-columns: 1fr 1fr; gap: 0 8px; }
+  @media (max-width: 1239px) {
+    .cf-dock { width: auto; overflow-x: auto; scrollbar-width: none; backdrop-filter: none; -webkit-backdrop-filter: none; background: rgb(14, 14, 20); }
+    .cf-dock::-webkit-scrollbar { display: none; }
+    .cf-dk-item { position: static; }
+    .cf-pop { position: fixed; left: 50%; transform: translateX(-50%); width: min(560px, calc(100vw - 24px)); top: calc(72px + env(safe-area-inset-top, 0px)); min-width: 0; max-height: 60vh; box-sizing: border-box; }
+  }
+  @media (max-width: 600px) { .cf-catlist { grid-template-columns: 1fr; }
+  }
+</style>
+
+  <div class="cf-dock" role="toolbar" aria-label="Filter and sort campaigns">
+    <div class="cf-dk-seg" role="group" aria-label="Type">
+      <button type="button" class="cf-seg" data-type="" aria-pressed="true">All</button><button type="button" class="cf-seg" data-type="Clipping" aria-pressed="false">Clipping</button><button type="button" class="cf-seg" data-type="UGC" aria-pressed="false">UGC</button><button type="button" class="cf-seg" data-type="Slideshow" aria-pressed="false">Slideshow</button>
+    </div>
+    <div class="cf-dk-item"><button type="button" class="cf-dk-btn" data-pop="pop-search" aria-expanded="false"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>Search<span class="cf-badge" data-draw="b-search"></span></button>
+      <div class="cf-pop" id="pop-search"><label class="cf-pop-label" for="f-q">Campaign, brand or category</label><input type="search" id="f-q" placeholder="e.g. podcast, Reach, faith" autocomplete="off"></div></div>
+    <div class="cf-dk-item"><button type="button" class="cf-dk-btn" data-pop="pop-sort" aria-expanded="false"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 7h16M7 12h10M10 17h4"/></svg>Sort</button>
+      <div class="cf-pop" id="pop-sort"><p class="cf-pop-label">Sort by</p><div class="cf-opts"><button type="button" class="cf-opt" data-sort-opt="left_per_creator" aria-pressed="false">Most budget per creator</button><button type="button" class="cf-opt" data-sort-opt="left" aria-pressed="false">Most budget left</button><button type="button" class="cf-opt" data-sort-opt="creators_asc" aria-pressed="false">Fewest creators</button><button type="button" class="cf-opt" data-sort-opt="budget" aria-pressed="false">Biggest total budget</button><button type="button" class="cf-opt" data-sort-opt="rate" aria-pressed="false">Highest pay per 1K</button><button type="button" class="cf-opt" data-sort-opt="max_payout" aria-pressed="false">Highest max payout</button><button type="button" class="cf-opt" data-sort-opt="age_asc" aria-pressed="false">Newest</button><button type="button" class="cf-opt" data-sort-opt="spent_per_day" aria-pressed="false">Fastest spending</button></div></div></div>
+    <div class="cf-dk-item"><button type="button" class="cf-dk-btn" data-pop="pop-cat" aria-expanded="false"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" stroke="none" stroke-width="2" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg>Category<span class="cf-badge" data-draw="b-cat"></span></button>
+      <div class="cf-pop cf-pop-wide" id="pop-cat"><div class="cf-pop-head"><p class="cf-pop-label">Categories (pick any)</p><button type="button" class="cf-link" id="cat-clear">Clear</button></div><div class="cf-catlist" data-draw="cat-list"></div></div></div>
+    <div class="cf-dk-item"><button type="button" class="cf-dk-btn" data-pop="pop-budget" aria-expanded="false"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M14.8 9.2c-.5-.9-1.6-1.4-2.8-1.4-1.6 0-2.8.8-2.8 2s1.2 1.7 2.8 2 2.8.8 2.8 2-1.2 2-2.8 2c-1.3 0-2.4-.5-2.9-1.5M12 6v1.8M12 16.2V18"/></svg>Budget<span class="cf-badge" data-draw="b-budget"></span></button>
+      <div class="cf-pop cf-pop-wide" id="pop-budget"><div class="cf-pop-group"><p class="cf-pop-label">Budget left</p><div class="cf-presets"><button type="button" class="cf-preset" data-k="minLeft" data-v="" aria-pressed="false">Any</button><button type="button" class="cf-preset" data-k="minLeft" data-v="1500" aria-pressed="false">$1.5K+</button><button type="button" class="cf-preset" data-k="minLeft" data-v="5000" aria-pressed="false">$5K+</button><button type="button" class="cf-preset" data-k="minLeft" data-v="10000" aria-pressed="false">$10K+</button><button type="button" class="cf-preset" data-k="minLeft" data-v="25000" aria-pressed="false">$25K+</button></div></div><div class="cf-pop-group"><p class="cf-pop-label">Creators competing</p><div class="cf-presets"><button type="button" class="cf-preset" data-k="maxCr" data-v="" aria-pressed="false">Any</button><button type="button" class="cf-preset" data-k="maxCr" data-v="10" aria-pressed="false">10 or fewer</button><button type="button" class="cf-preset" data-k="maxCr" data-v="25" aria-pressed="false">25 or fewer</button><button type="button" class="cf-preset" data-k="maxCr" data-v="50" aria-pressed="false">50 or fewer</button><button type="button" class="cf-preset" data-k="maxCr" data-v="100" aria-pressed="false">100 or fewer</button></div></div><div class="cf-pop-group"><p class="cf-pop-label">Pay per 1K views</p><div class="cf-presets"><button type="button" class="cf-preset" data-k="minRate" data-v="" aria-pressed="false">Any</button><button type="button" class="cf-preset" data-k="minRate" data-v="1" aria-pressed="false">$1+</button><button type="button" class="cf-preset" data-k="minRate" data-v="1.5" aria-pressed="false">$1.50+</button><button type="button" class="cf-preset" data-k="minRate" data-v="2" aria-pressed="false">$2+</button><button type="button" class="cf-preset" data-k="minRate" data-v="3" aria-pressed="false">$3+</button></div></div><div class="cf-pop-group"><p class="cf-pop-label">Launched</p><div class="cf-presets"><button type="button" class="cf-preset" data-k="maxAge" data-v="" aria-pressed="false">Any time</button><button type="button" class="cf-preset" data-k="maxAge" data-v="7" aria-pressed="false">This week</button><button type="button" class="cf-preset" data-k="maxAge" data-v="30" aria-pressed="false">This month</button></div></div></div></div>
+    <div class="cf-dk-item"><button type="button" class="cf-dk-btn" data-pop="pop-more" aria-expanded="false"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg>Filters<span class="cf-badge" data-draw="b-more"></span></button>
+      <div class="cf-pop cf-pop-wide" id="pop-more"><p class="cf-pop-label">Show / hide</p><label class="cf-tog"><input type="checkbox" id="f-zero" checked><span>Hide campaigns nobody joined</span></label><label class="cf-tog"><input type="checkbox" id="f-gamb" checked><span>Hide casino &amp; betting</span></label><label class="cf-tog"><input type="checkbox" id="f-nonen" checked><span>Hide non-English / regional</span></label><label class="cf-tog"><input type="checkbox" id="f-face" checked><span>Hide on-camera</span></label><label class="cf-tog"><input type="checkbox" id="f-new"><span>New in the last 3 days</span></label><label class="cf-tog"><input type="checkbox" id="f-paying"><span>Already paying creators</span></label><label class="cf-tog"><input type="checkbox" id="f-podcast"><span>Podcasts only</span></label><label class="cf-tog"><input type="checkbox" id="f-cpm"><span>Pay per view only (no flat fee)</span></label></div></div>
+    <div class="cf-dk-plats" role="group" aria-label="Platforms (pays on any selected)"><button type="button" class="cf-dk-icon cf-plat-btn" data-plat="TikTok" aria-pressed="false" aria-label="TikTok" title="TikTok"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M14 3c.4 2.3 1.9 3.8 4.2 4v3c-1.6 0-3-.5-4.2-1.3v6.1A5.3 5.3 0 1 1 8.7 9.5v3.1a2.3 2.3 0 1 0 2.3 2.3V3h3z"/></svg></button><button type="button" class="cf-dk-icon cf-plat-btn" data-plat="Instagram" aria-pressed="false" aria-label="Instagram" title="Instagram"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="17.2" cy="6.8" r="1.2"/></svg></button><button type="button" class="cf-dk-icon cf-plat-btn" data-plat="YouTube" aria-pressed="false" aria-label="YouTube" title="YouTube"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M21.6 7.2a2.6 2.6 0 0 0-1.8-1.8C18.2 5 12 5 12 5s-6.2 0-7.8.4A2.6 2.6 0 0 0 2.4 7.2 27 27 0 0 0 2 12a27 27 0 0 0 .4 4.8 2.6 2.6 0 0 0 1.8 1.8c1.6.4 7.8.4 7.8.4s6.2 0 7.8-.4a2.6 2.6 0 0 0 1.8-1.8A27 27 0 0 0 22 12a27 27 0 0 0-.4-4.8zM10 15V9l5.2 3L10 15z"/></svg></button><button type="button" class="cf-dk-icon cf-plat-btn" data-plat="X" aria-pressed="false" aria-label="X" title="X"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M17.8 3h3.1l-6.8 7.8L22 21h-6.2l-4.9-6.4L5.3 21H2.2l7.3-8.3L2 3h6.4l4.4 5.8L17.8 3zm-1.1 16.2h1.7L7.4 4.7H5.6l11.1 14.5z"/></svg></button><button type="button" class="cf-dk-icon cf-plat-btn" data-plat="Facebook" aria-pressed="false" aria-label="Facebook" title="Facebook"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M13.5 21v-7.5H16l.4-3h-2.9V8.6c0-.9.3-1.5 1.5-1.5h1.5V4.4c-.3 0-1.2-.1-2.2-.1-2.2 0-3.7 1.3-3.7 3.8v2.4H8v3h2.6V21h2.9z"/></svg></button></div>
+    <span class="cf-dk-sep" aria-hidden="true"></span>
+    <button type="button" class="cf-dk-btn cf-dk-clear" id="f-reset">Clear</button>
+    <span class="cf-dk-count" data-draw="b-count">—</span>
+  </div>
+<div class="cf-shell">
+  <aside class="cf-side" aria-label="Sections and filters">
+    <div class="cf-brand"><span class="cf-mark" aria-hidden="true"></span>Campaign Finder</div>
+    <nav class="cf-nav" aria-label="Sections">
+      <a href="#picks">Best picks</a><a href="#kpis">Overview</a><a href="#map">Budget vs competition</a><a href="#cats">Categories</a><a href="#list">All campaigns</a>
+    </nav>
+
+    <p class="cf-sidefoot" data-draw="side-updated">—</p>
+  </aside>
+<div class="cf" data-source="campaigns">
+  <header class="cf-head cf-hero" id="top">
+    <p class="cf-eyebrow">Content Rewards · refreshed every 4 hours</p>
+    <h1>Campaign Finder</h1>
+    <p class="cf-take" data-read lang="en"><b data-draw="t-count">—</b> campaigns match your filters, with <b data-draw="t-left">—</b> still unspent. Most budget per creator: <b data-draw="t-best">—</b>.</p>
+    <p class="cf-hint" data-draw="t-updated">—</p>
+  </header>
+
+
+
+
+  <section class="cf-picks" id="picks">
+    <div class="cf-sechead"><h2>Best picks right now</h2><p class="cf-hint">Most budget per creator among campaigns already paying out, with 3+ creators, under your filters.</p></div>
+    <div class="cf-pickgrid" data-draw="picks" data-source="campaigns"></div>
+  </section>
+
+
+
+  <section class="cf-kpis" id="kpis" aria-label="Summary">
+    <div class="cf-panel cf-kpi"><div class="cf-k">Matching campaigns</div><div class="cf-v" data-draw="k-count">—</div><div class="cf-s" data-draw="k-count-s">—</div></div>
+    <div class="cf-panel cf-kpi"><div class="cf-k">Budget still unspent</div><div class="cf-v" data-draw="k-left">—</div><div class="cf-s" data-draw="k-left-s">—</div></div>
+    <div class="cf-panel cf-kpi"><div class="cf-k">Median pay per 1K views</div><div class="cf-v" data-draw="k-rate">—</div><div class="cf-s">best platform rate per campaign</div></div>
+    <div class="cf-panel cf-kpi"><div class="cf-k">Median creators</div><div class="cf-v" data-draw="k-cr">—</div><div class="cf-s">competing in each campaign</div></div>
+  </section>
+
+  <section class="cf-charts">
+    <div class="cf-panel" id="map">
+      <h2>Budget left vs competition</h2>
+      <p class="cf-hint">Top-left is the sweet spot: lots of money, few creators. Drag a box to filter the table; double-click to clear.</p>
+      <div class="cf-chart" data-draw="scatter" data-source="campaigns"></div>
+      <div class="cf-legend"><span><i style="background:var(--cf-c0)"></i>Clipping</span><span><i style="background:var(--cf-c1)"></i>UGC</span><span><i style="background:var(--cf-c2)"></i>Slideshow</span><span>Bigger dot = higher pay per 1K</span></div>
+    </div>
+    <div class="cf-panel" id="cats">
+      <h2>Budget left by category</h2>
+      <p class="cf-hint">Click bars to filter to those categories; click again to remove.</p>
+      <div class="cf-chart" data-draw="bars" data-source="campaigns"></div>
+    </div>
+  </section>
+
+  <section class="cf-panel" id="list">
+    <div class="cf-tablehead">
+      <div><h2>Campaigns</h2><p class="cf-hint" data-draw="shown">—</p></div>
+      <button type="button" class="cf-btn" id="f-clearsel" hidden>Clear chart selection</button>
+    </div>
+    <div class="cf-tablewrap">
+      <table class="cf-table" data-source="campaigns" data-row-key="id">
+        <thead><tr>
+          <th class="cf-th" data-field="campaign" data-sort="campaign" tabindex="0">Campaign</th>
+          <th class="cf-th" data-field="type" data-sort="type" tabindex="0">Type</th>
+          <th class="cf-th" data-field="platforms" tabindex="0">Platforms</th>
+          <th class="cf-th" data-field="rate" data-sort="rate" tabindex="0">Pay / 1K</th>
+          <th class="cf-th" data-field="left" data-sort="left" tabindex="0">Left</th>
+          <th class="cf-th" data-field="budget" data-sort="budget" tabindex="0">Total budget</th>
+          <th class="cf-th" data-field="spent_pct" data-sort="spent_pct" tabindex="0">Spent</th>
+          <th class="cf-th" data-field="creators" data-sort="creators_asc" tabindex="0">Creators</th>
+          <th class="cf-th" data-field="left_per_creator" data-sort="left_per_creator" tabindex="0">Left / creator</th>
+          <th class="cf-th" data-field="max_payout" data-sort="max_payout" tabindex="0">Max / clip</th>
+          <th class="cf-th" data-field="spent_per_day" data-sort="spent_per_day" tabindex="0">Spent / day</th>
+          <th class="cf-th" data-field="age" data-sort="age_asc" tabindex="0">Age</th>
+          <th>Flags</th>
+        </tr></thead>
+        <tbody data-draw="rows"></tbody>
+      </table>
+    </div>
+    <button type="button" class="cf-btn cf-more" id="f-more">Show 100 more</button>
+  </section>
+
+  <details class="cf-notes" id="notes">
+    <summary>How this was put together</summary>
+    <p>Every campaign card on Content Rewards Discover (All campaigns) is read every 4 hours, and every campaign with $1,500 or more left was opened to read its platforms, pay per platform, min and max payout and visible rules. Campaigns with less left show only the card data, so their platforms and max payout are blank.</p>
+    <p>"Left / creator" is budget left divided by the number of creators who have joined. It is a rough measure of competition, not a forecast of earnings. "Spent / day" is how much the campaign paid out over roughly the last 24 hours. "New" means it launched or first appeared in the last 3 days. The casino, regional, on-camera and US-audience flags are keyword guesses from the title, description and visible rules. Most audience rules are hidden until you join, so check them before posting.</p>
+  </details>
+</div>
+</div>
+
+<script>
+  // ---------- shared filter state ----------
+  window.CF = window.CF || {
+    q: '', type: '', cats: [], plats: [], minLeft: 1500, maxCr: null, minRate: null, maxAge: null, hideZero: true, isNew: false,
+    hideGamb: true, hideNonEn: true, hideFace: true, paying: false, podcast: false, cpm: false,
+    brush: null, sort: 'left_per_creator', limit: 100,
+  };
+  window.CF_redraw = (except) => ['b-search', 'b-cat', 'b-budget', 'b-more', 'b-count', 'cat-list', 'picks', 'side-updated', 't-updated', 't-count', 't-left', 't-best', 'k-count', 'k-count-s', 'k-left', 'k-left-s', 'k-rate', 'k-cr', 'scatter', 'bars', 'rows', 'shown']
+    .filter((n) => n !== except).forEach((n) => dash.draw(n));
+  window.CF_rows = () => { const d = dash.data('campaigns'); return d.status === 'ok' ? d.data : null; };
+  // skip: 'cat' (bars), 'brush' (scatter) for cross-filtering
+  window.CF_filter = (rows, skip) => {
+    const s = window.CF, q = s.q.trim().toLowerCase();
+    return rows.filter((r) => {
+      if (q && !(`${r.campaign} ${r.org} ${r.category}`.toLowerCase().includes(q))) return false;
+      if (s.type && r.type !== s.type) return false;
+      if (skip !== 'cat' && s.cats.length && !s.cats.includes(r.category)) return false;
+      if (s.minLeft != null && r.left < s.minLeft) return false;
+      if (s.maxCr != null && r.creators > s.maxCr) return false;
+      if (s.minRate != null && !(r.rate >= s.minRate)) return false;
+      if (s.maxAge != null && !(r.age_days != null && r.age_days <= s.maxAge)) return false;
+      if (s.plats.length && !s.plats.some((p) => (r.platforms || '').split(', ').includes(p))) return false;
+      if (s.hideZero && !(r.creators > 0)) return false;
+      if (s.hideGamb && r.gambling) return false;
+      if (s.hideNonEn && r.non_english) return false;
+      if (s.hideFace && r.face) return false;
+      if (s.paying && !(r.paid > 0)) return false;
+      if (s.isNew && !window.CF_isNew(r)) return false;
+      if (s.podcast && !r.podcast) return false;
+      if (s.cpm && r.per_post) return false;
+      if (skip !== 'brush' && s.brush) {
+        const b = s.brush, x = r.creators + 1, y = r.left + 1;
+        if (x < b.x0 || x > b.x1 || y < b.y0 || y > b.y1) return false;
+      }
+      return true;
+    });
+  };
+  window.CF_sorted = (rows) => {
+    const k = window.CF.sort, v = (r) => r[k.replace(/_asc$/, '')];
+    const asc = k.endsWith('_asc') || k === 'campaign' || k === 'type';
+    return rows.slice().sort((a, b) => {
+      const x = v(a), y = v(b);
+      if (x == null && y == null) return 0; if (x == null) return 1; if (y == null) return -1;
+      return (typeof x === 'string' ? x.localeCompare(y) : x - y) * (asc ? 1 : -1);
+    });
+  };
+  window.CF_isNew = (r) => r.first_seen && (Date.now() - Date.parse(r.first_seen)) < 3 * 864e5;
+  window.CF_fmt = { money: d3.format('$,.0f'), k: (v) => v >= 1e6 ? d3.format('$,.2~f')(v / 1e6) + 'M' : v >= 1000 ? d3.format('$,.1~f')(v / 1000) + 'K' : d3.format('$,.0f')(v), rate: d3.format('$,.2~f'), int: d3.format(',') };
+
+  // ---------- controls (listen only) ----------
+  const CF = window.CF, $ = (id) => document.getElementById(id);
+  const num = (el) => (el.value === '' ? null : +el.value);
+  const bind = (id, ev, fn) => { const el = $(id); if (el) el.addEventListener(ev, () => { fn(el); CF.limit = 100; window.CF_redraw(); }); };
+  bind('f-q', 'input', (el) => (CF.q = el.value));
+  bind('f-type', 'change', (el) => (CF.type = el.value));
+  bind('f-sort', 'change', (el) => (CF.sort = el.value));
+  bind('f-minleft', 'input', (el) => (CF.minLeft = num(el)));
+  bind('f-maxcr', 'input', (el) => (CF.maxCr = num(el)));
+  bind('f-minrate', 'input', (el) => (CF.minRate = num(el)));
+  bind('f-maxage', 'input', (el) => (CF.maxAge = num(el)));
+  bind('f-zero', 'change', (el) => (CF.hideZero = el.checked));
+  bind('f-gamb', 'change', (el) => (CF.hideGamb = el.checked));
+  bind('f-nonen', 'change', (el) => (CF.hideNonEn = el.checked));
+  bind('f-face', 'change', (el) => (CF.hideFace = el.checked));
+  bind('f-new', 'change', (el) => (CF.isNew = el.checked));
+  bind('f-paying', 'change', (el) => (CF.paying = el.checked));
+  bind('f-podcast', 'change', (el) => (CF.podcast = el.checked));
+  bind('f-cpm', 'change', (el) => (CF.cpm = el.checked));
+  document.querySelectorAll('.f-plat').forEach((el) => el.addEventListener('change', () => {
+    CF.plats = [...document.querySelectorAll('.f-plat')].filter((c) => c.checked).map((c) => c.value); CF.limit = 100; window.CF_redraw();
+  }));
+  document.querySelectorAll('.cf-th[data-sort]').forEach((th) => {
+    const go = () => { CF.sort = th.dataset.sort; const s = $('f-sort'); if (s && [...s.options].some((o) => o.value === CF.sort)) s.value = CF.sort; window.CF_sync(); window.CF_redraw(); };
+    th.addEventListener('click', go); th.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } });
+  });
+  const more = $('f-more'); if (more) more.addEventListener('click', () => { CF.limit += 100; dash.draw('rows'); dash.draw('shown'); });
+  const clr = $('f-clearsel'); if (clr) clr.addEventListener('click', () => { CF.brush = null; window.CF_redraw(); });
+  const reset = $('f-reset');
+  if (reset) reset.addEventListener('click', () => {
+    Object.assign(CF, { q: '', type: '', cats: [], plats: [], minLeft: 1500, maxCr: null, minRate: null, maxAge: null, hideZero: true, isNew: false, hideGamb: true, hideNonEn: true,
+      hideFace: true, paying: false, podcast: false, cpm: false, brush: null, sort: 'left_per_creator', limit: 100 });
+    const set = (id, v) => { const el = $(id); if (el) { if (el.type === 'checkbox') el.checked = v; else el.value = v; } };
+    set('f-q', ''); set('f-type', ''); set('f-sort', 'left_per_creator'); set('f-minleft', 1500); set('f-maxcr', ''); set('f-minrate', ''); set('f-maxage', '');
+    set('f-zero', true); set('f-gamb', true); set('f-nonen', true); set('f-face', true); set('f-paying', false); set('f-new', false); set('f-podcast', false); set('f-cpm', false);
+    document.querySelectorAll('.f-plat').forEach((c) => (c.checked = false));
+    window.CF_redraw();
+  });
+  const sideF = $('side-filters'); if (sideF && window.matchMedia) sideF.open = matchMedia('(min-width: 1000px)').matches;
+  const navLinks = [...document.querySelectorAll('.cf-nav a')];
+  if ('IntersectionObserver' in window && navLinks.length) {
+    const io = new IntersectionObserver((ents) => ents.forEach((e) => { if (e.isIntersecting) navLinks.forEach((a) => a.classList.toggle('cf-active', a.getAttribute('href') === '#' + e.target.id)); }),
+      { root: document, rootMargin: '-30% 0px -60% 0px' });
+    navLinks.forEach((a) => { const t = document.getElementById(a.getAttribute('href').slice(1)); if (t) io.observe(t); });
+  }
+  // ---------- top bar wiring ----------
+  window.CF_sync = () => {
+    document.querySelectorAll('.cf-seg').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.type === CF.type)));
+    document.querySelectorAll('[data-sort-opt]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.sortOpt === CF.sort)));
+    document.querySelectorAll('.cf-preset').forEach((b) => b.setAttribute('aria-pressed', String((CF[b.dataset.k] == null ? '' : String(CF[b.dataset.k])) === b.dataset.v)));
+    document.querySelectorAll('.cf-plat-btn').forEach((b) => b.setAttribute('aria-pressed', String(CF.plats.includes(b.dataset.plat))));
+  };
+  const closePops = (except) => document.querySelectorAll('.cf-dk-btn[data-pop]').forEach((b) => {
+    if (b === except) return; b.setAttribute('aria-expanded', 'false'); const p = $(b.dataset.pop); if (p) p.classList.remove('cf-open');
+  });
+  document.querySelectorAll('.cf-dk-btn[data-pop]').forEach((b) => b.addEventListener('click', (e) => {
+    e.stopPropagation(); const p = $(b.dataset.pop); const open = !(p && p.classList.contains('cf-open'));
+    closePops(b); if (p) p.classList.toggle('cf-open', open); b.setAttribute('aria-expanded', String(open));
+    if (open && b.dataset.pop === 'pop-search') { const q = $('f-q'); if (q) q.focus(); }
+  }));
+  document.querySelectorAll('.cf-pop').forEach((p) => p.addEventListener('click', (e) => e.stopPropagation()));
+  document.addEventListener('click', () => closePops());
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closePops(); });
+  const qBox = $('f-q'); if (qBox) qBox.addEventListener('keydown', (e) => { if (e.key === 'Escape') e.preventDefault(); }); // Esc closes the menu, keeps the search text
+  const after = () => { CF.limit = 100; window.CF_sync(); window.CF_redraw(); };
+  document.querySelectorAll('.cf-seg').forEach((b) => b.addEventListener('click', () => { CF.type = b.dataset.type; after(); }));
+  document.querySelectorAll('[data-sort-opt]').forEach((b) => b.addEventListener('click', () => { CF.sort = b.dataset.sortOpt; after(); closePops(); }));
+  document.querySelectorAll('.cf-preset').forEach((b) => b.addEventListener('click', () => { CF[b.dataset.k] = b.dataset.v === '' ? null : +b.dataset.v; after(); }));
+  document.querySelectorAll('.cf-plat-btn').forEach((b) => b.addEventListener('click', () => {
+    const pl = b.dataset.plat; CF.plats = CF.plats.includes(pl) ? CF.plats.filter((x) => x !== pl) : [...CF.plats, pl]; after();
+  }));
+  const cc = $('cat-clear'); if (cc) cc.addEventListener('click', () => { CF.cats = []; after(); });
+  if (reset) reset.addEventListener('click', () => window.CF_sync());
+  window.CF_sync();
+  // series colours as CSS variables for the legend
+  document.querySelectorAll('.cf, .cf-side').forEach((el) => { (dash.colors || []).slice(0, 3).forEach((c, i) => el.style.setProperty(`--cf-c${i}`, c)); });
+</script>
+
+<script>
+  const F = window.CF_fmt;
+  const T = (el, txt) => { el.textContent = txt; };
+  const view = () => { const rows = window.CF_rows(); return rows ? window.CF_filter(rows) : null; };
+
+  // ---------- text figures ----------
+  dash.draw('t-count', (el) => { const v = view(); T(el, v ? F.int(v.length) : '—'); });
+  dash.draw('t-left', (el) => { const v = view(); T(el, v ? F.money(d3.sum(v, (r) => r.left)) : '—'); });
+  dash.draw('t-best', (el) => {
+    const v = view(); if (!v || !v.length) return T(el, '—');
+    const b = d3.greatest(v, (r) => r.left_per_creator);
+    T(el, `${b.campaign} (${F.k(b.left)} left, ${b.creators} creator${b.creators === 1 ? '' : 's'})`);
+  });
+  dash.draw('t-updated', (el) => {
+    const m = (window.__META || {}); if (!m.updated) return T(el, '—');
+    const h = (Date.now() - Date.parse(m.updated)) / 36e5;
+    T(el, `Updated ${h < 1 ? Math.max(1, Math.round(h * 60)) + ' min' : Math.round(h) + ' h'} ago (${new Date(m.updated).toLocaleString()}). Refreshes every 4 hours.`);
+  });
+  dash.draw('side-updated', (el) => {
+    const m = (window.__META || {}); if (!m.updated) return T(el, '—');
+    const h = (Date.now() - Date.parse(m.updated)) / 36e5;
+    T(el, `Data updated ${h < 1 ? Math.max(1, Math.round(h * 60)) + ' min' : Math.round(h) + ' h'} ago · refreshes every 4 hours`);
+  });
+  dash.draw('k-count', (el) => { const v = view(); T(el, v ? F.int(v.length) : '—'); });
+  dash.draw('k-count-s', (el) => { const r = window.CF_rows(); T(el, r ? `of ${F.int(r.length)} listed` : '—'); });
+  dash.draw('k-left', (el) => { const v = view(); T(el, v ? F.k(d3.sum(v, (r) => r.left)) : '—'); });
+  dash.draw('k-left-s', (el) => { const v = view(); T(el, v ? `of ${F.k(d3.sum(v, (r) => r.budget))} total budget` : '—'); });
+  dash.draw('k-rate', (el) => { const v = view(); const m = v && d3.median(v.filter((r) => !r.per_post), (r) => r.rate); T(el, m != null ? F.rate(m) : '—'); });
+  dash.draw('k-cr', (el) => { const v = view(); const m = v && d3.median(v, (r) => r.creators); T(el, m != null ? F.int(Math.round(m)) : '—'); });
+  dash.draw('shown', (el) => {
+    const v = view(); if (!v) return T(el, '—');
+    const n = Math.min(v.length, window.CF.limit);
+    T(el, `Showing ${F.int(n)} of ${F.int(v.length)}. Click a column to sort.`);
+    const m = document.getElementById('f-more'); if (m) m.hidden = v.length <= window.CF.limit;
+    const c = document.getElementById('f-clearsel'); if (c) c.hidden = !window.CF.brush;
+    document.querySelectorAll('.cf-th[data-sort]').forEach((th) => th.classList.toggle('cf-sorted', th.dataset.sort === window.CF.sort));
+  });
+
+  // ---------- top picks ----------
+  dash.draw('picks', (el) => {
+    el.replaceChildren();
+    const v = view(); if (!v) { el.textContent = '—'; return; }
+    const top = v.filter((r) => r.paid > 0 && r.creators >= 3).sort((a, b) => b.left_per_creator - a.left_per_creator).slice(0, 3);
+    if (!top.length) { const p = document.createElement('p'); p.className = 'cf-hint'; p.textContent = 'No paying campaign matches these filters.'; el.append(p); return; }
+    top.forEach((r, i) => {
+      const a = document.createElement('a'); a.className = 'cf-pick'; a.href = r.url; a.target = '_blank'; a.rel = 'noopener';
+      const rank = document.createElement('span'); rank.className = 'cf-pick-rank'; rank.textContent = '#' + (i + 1);
+      const t = document.createElement('span'); t.className = 'cf-pick-title'; t.textContent = r.campaign;
+      const o = document.createElement('span'); o.className = 'cf-pick-org'; o.textContent = `${r.org} · ${r.category}`;
+      const big = document.createElement('span'); big.className = 'cf-pick-big'; big.textContent = F.k(r.left);
+      const bl = document.createElement('span'); bl.className = 'cf-pick-biglabel'; bl.textContent = 'still up for grabs';
+      const meta = document.createElement('span'); meta.className = 'cf-pick-meta';
+      [[F.int(r.creators), 'creators'], [r.per_post ? 'per post' : F.rate(r.rate), 'per 1K'], [r.max_payout != null ? F.money(r.max_payout) : '—', 'max / clip']].forEach(([val, lab]) => {
+        const s = document.createElement('span'); const b = document.createElement('b'); b.textContent = val; s.append(b, ' ' + lab); meta.append(s);
+      });
+      const bar = document.createElement('span'); bar.className = 'cf-pick-bar'; const fill = document.createElement('i');
+      fill.style.width = Math.max(3, 100 - (r.spent_pct || 0)) + '%'; bar.append(fill);
+      a.append(rank, t, o, big, bl, bar, meta); el.append(a);
+    });
+  });
+
+  // ---------- top bar: category list, badges, count ----------
+  dash.draw('cat-list', (el) => {
+    el.replaceChildren();
+    const rows = window.CF_rows(); if (!rows) { el.textContent = '—'; return; }
+    const counts = d3.rollup(window.CF_filter(rows, 'cat'), (g) => g.length, (r) => r.category);
+    for (const c of [...new Set(rows.map((r) => r.category))].sort()) {
+      const lab = document.createElement('label'); lab.className = 'cf-tog';
+      const cb = document.createElement('input'); cb.type = 'checkbox'; cb.checked = window.CF.cats.includes(c);
+      cb.onchange = () => { const x = window.CF.cats; window.CF.cats = cb.checked ? [...x, c] : x.filter((y) => y !== c); window.CF.limit = 100; window.CF_redraw('cat-list'); };
+      const t = document.createElement('span'); t.textContent = c;
+      const n = document.createElement('em'); n.textContent = counts.get(c) || 0;
+      lab.append(cb, t, n); el.append(lab);
+    }
+  });
+  const badge = (el, n) => { el.textContent = n ? String(n) : ''; };
+  dash.draw('b-search', (el) => badge(el, window.CF.q.trim() ? 1 : 0));
+  dash.draw('b-cat', (el) => badge(el, window.CF.cats.length));
+  dash.draw('b-budget', (el) => badge(el, ['minLeft', 'maxCr', 'minRate', 'maxAge'].filter((k) => window.CF[k] != null && window.CF[k] !== 0).length));
+  dash.draw('b-more', (el) => badge(el, ['isNew', 'paying', 'podcast', 'cpm'].filter((k) => window.CF[k]).length));
+  dash.draw('b-count', (el) => { const v = view(); el.textContent = v ? `${F.int(v.length)} results` : '—'; });
+
+  // ---------- table ----------
+  dash.draw('rows', (tb) => {
+    const v = view(); tb.replaceChildren();
+    if (!v) return;
+    const pill = (txt, cls) => { const s = document.createElement('span'); s.className = 'cf-pill' + (cls ? ' ' + cls : ''); s.textContent = txt; return s; };
+    for (const r of window.CF_sorted(v).slice(0, window.CF.limit)) {
+      const tr = document.createElement('tr'); tr.dataset.key = r.id;
+      const td = (txt) => { const c = document.createElement('td'); c.textContent = txt; tr.append(c); return c; };
+      const first = document.createElement('td');
+      const a = document.createElement('a'); a.href = r.url; a.target = '_blank'; a.rel = 'noopener'; a.textContent = r.campaign;
+      const o = document.createElement('span'); o.className = 'cf-org'; o.textContent = `${r.org} · ${r.category}`;
+      first.append(a, o); tr.append(first);
+      td(r.type);
+      const pc = document.createElement('td');
+      (r.platforms ? r.platforms.split(', ') : []).forEach((p) => { const s = document.createElement('span'); s.className = 'cf-plat cf-plat-' + p.toLowerCase(); s.textContent = p === 'Instagram' ? 'IG' : p === 'YouTube' ? 'YT' : p === 'TikTok' ? 'TT' : p; s.title = p; pc.append(s); });
+      if (!r.platforms) pc.textContent = '—';
+      tr.append(pc);
+      const rc = td(r.per_post ? 'per post' : F.rate(r.rate));
+      rc.className = 'cf-ratecell ' + (r.per_post ? '' : r.rate >= 2 ? 'cf-rate-hi' : r.rate >= 1 ? 'cf-rate-mid' : 'cf-rate-lo');
+      td(F.money(r.left)); td(F.money(r.budget));
+      td(r.spent_pct != null ? `${Math.round(r.spent_pct)}%` : '—');
+      td(F.int(r.creators)); td(F.money(r.left_per_creator));
+      td(r.max_payout != null ? F.money(r.max_payout) : '—');
+      td(r.spent_per_day != null ? F.money(r.spent_per_day) : '—');
+      td(r.age || '—');
+      const fl = document.createElement('td');
+      if (window.CF_isNew(r)) fl.append(pill('new', 'cf-ok'));
+      if (r.gambling) fl.append(pill('casino', 'cf-bad'));
+      if (r.non_english) fl.append(pill('regional', 'cf-warn'));
+      if (r.face) fl.append(pill('on-camera', 'cf-warn'));
+      if (r.us_rule) fl.append(pill(r.geo ? `US/T1 ${r.geo}` : 'US/T1 rule', 'cf-warn'));
+      if (r.podcast) fl.append(pill('podcast', 'cf-ok'));
+      if (r.paid === 0) fl.append(pill('no payouts yet'));
+      tr.append(fl);
+      tb.append(tr);
+    }
+  });
+
+  // ---------- scatter: creators (x) vs budget left (y), brush to filter ----------
+  dash.draw('scatter', (el) => {
+    el.replaceChildren();
+    const rows = window.CF_rows(); if (!rows) { el.textContent = '—'; return; }
+    const pts = window.CF_filter(rows, 'brush');
+    const W = Math.max(280, el.clientWidth), H = 320, m = { t: 10, r: 14, b: 38, l: 58 };
+    const x = d3.scaleLog().domain([1, Math.max(10, d3.max(pts, (r) => r.creators + 1) || 10)]).range([m.l, W - m.r]).nice();
+    const y = d3.scaleLog().domain([Math.max(100, d3.min(pts, (r) => r.left + 1) || 100), Math.max(1000, d3.max(pts, (r) => r.left + 1) || 1000)]).range([H - m.b, m.t]).nice();
+    const rr = d3.scaleSqrt().domain([0, 5]).range([3, 9]).clamp(true);
+    const col = { Clipping: dash.colors[0], UGC: dash.colors[1], Slideshow: dash.colors[2] };
+    const svg = d3.select(el).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`).attr('role', 'img')
+      .attr('aria-label', 'Scatter plot of campaigns: number of creators against budget left');
+    svg.append('g').attr('class', 'cf-grid').attr('transform', `translate(${m.l},0)`).call(d3.axisLeft(y).ticks(5).tickSize(-(W - m.l - m.r)).tickFormat('')).call((g) => g.select('.domain').remove());
+    svg.append('g').attr('transform', `translate(0,${H - m.b})`).call(d3.axisBottom(x).ticks(6, '~s'));
+    svg.append('g').attr('transform', `translate(${m.l},0)`).call(d3.axisLeft(y).ticks(5, '$~s'));
+    svg.append('text').attr('x', W - m.r).attr('y', H - 4).attr('text-anchor', 'end').text('Creators (log scale) →');
+    svg.append('text').attr('x', m.l).attr('y', m.t + 2).attr('dy', '0.7em').attr('dx', 6).text('↑ Budget left');
+    const inB = (r, b) => !b || (r.creators + 1 >= b.x0 && r.creators + 1 <= b.x1 && r.left + 1 >= b.y0 && r.left + 1 <= b.y1);
+    const dots = svg.append('g').selectAll('circle').data(pts, (r) => r.id).join('circle').attr('class', 'cf-dot')
+      .attr('cx', (r) => x(r.creators + 1)).attr('cy', (r) => y(r.left + 1)).attr('r', (r) => rr(r.per_post ? 1 : r.rate))
+      .style('fill', (r) => col[r.type] || dash.colors[0]).classed('cf-out', (r) => !inB(r, window.CF.brush));
+    const tip = d3.select(el).append('div').attr('class', 'cf-tip').style('opacity', 0);
+    const brush = d3.brush().extent([[m.l, m.t], [W - m.r, H - m.b]])
+      .on('end', (ev) => {
+        if (!ev.sourceEvent) return;
+        if (!ev.selection) { window.CF.brush = null; }
+        else {
+          const [[a, b], [c, d]] = ev.selection;
+          window.CF.brush = { x0: x.invert(a), x1: x.invert(c), y0: y.invert(d), y1: y.invert(b) };
+        }
+        dots.classed('cf-out', (r) => !inB(r, window.CF.brush));
+        window.CF.limit = 100; window.CF_redraw('scatter');
+      });
+    const bg = svg.append('g').call(brush);
+    bg.on('dblclick', () => { window.CF.brush = null; bg.call(brush.move, null); dots.classed('cf-out', false); window.CF_redraw('scatter'); });
+    if (window.CF.brush) { const b = window.CF.brush; bg.call(brush.move, [[x(b.x0), y(b.y1)], [x(b.x1), y(b.y0)]]); }
+    dots.raise().on('mousemove', (ev, r) => {
+      const [px, py] = d3.pointer(ev, el);
+      tip.style('opacity', 1).style('left', Math.min(px + 12, el.clientWidth - 270) + 'px').style('top', (py + 12) + 'px').replaceChildren();
+      tip.append('b').text(r.campaign);
+      tip.append('div').text(`${r.org} · ${r.type}`);
+      tip.append('div').text(`${F.money(r.left)} left of ${F.money(r.budget)} · ${F.int(r.creators)} creators`);
+      tip.append('div').text(`${r.per_post ? 'paid per post' : F.rate(r.rate) + ' per 1K'}${r.max_payout != null ? ' · max ' + F.money(r.max_payout) : ''}`);
+    }).on('mouseleave', () => tip.style('opacity', 0))
+      .on('click', (ev, r) => window.open(r.url, '_blank', 'noopener'));
+  });
+
+  // ---------- bars: budget left by category, click to filter ----------
+  dash.draw('bars', (el) => {
+    el.replaceChildren();
+    const rows = window.CF_rows(); if (!rows) { el.textContent = '—'; return; }
+    const v = window.CF_filter(rows, 'cat');
+    const data = d3.rollups(v, (g) => ({ left: d3.sum(g, (r) => r.left), n: g.length }), (r) => r.category)
+      .map(([cat, o]) => ({ cat, ...o })).sort((a, b) => b.left - a.left).slice(0, 12);
+    const W = Math.max(280, el.clientWidth), bh = 22, gap = 6, H = Math.max(120, data.length * (bh + gap) + 10);
+    const svg = d3.select(el).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`).attr('role', 'img')
+      .attr('aria-label', 'Bar chart of budget left by category');
+    const lab = svg.append('g'); const tmp = lab.selectAll('text').data(data).join('text').text((d) => d.cat);
+    const lw = Math.min(W * 0.42, (d3.max(tmp.nodes(), (n) => n.getComputedTextLength()) || 80) + 10); tmp.remove();
+    const vw = 70;
+    const x = d3.scaleLinear().domain([0, d3.max(data, (d) => d.left) || 1]).range([0, W - lw - vw]);
+    const g = svg.append('g').selectAll('g').data(data).join('g').attr('class', 'cf-bar').attr('transform', (d, i) => `translate(0,${i * (bh + gap) + 4})`)
+      .classed('cf-dim', (d) => window.CF.cats.length && !window.CF.cats.includes(d.cat))
+      .on('click', (ev, d) => {
+        const c = window.CF.cats; window.CF.cats = c.includes(d.cat) ? c.filter((x) => x !== d.cat) : [...c, d.cat]; window.CF.limit = 100;
+        window.CF_redraw();
+      });
+    g.append('text').attr('x', lw - 8).attr('y', bh / 2).attr('dy', '0.35em').attr('text-anchor', 'end').text((d) => d.cat);
+    g.append('rect').attr('x', lw).attr('height', bh).attr('rx', 3).attr('width', (d) => Math.max(2, x(d.left))).style('fill', dash.colors[0]);
+    g.append('text').attr('x', (d) => lw + Math.max(2, x(d.left)) + 6).attr('y', bh / 2).attr('dy', '0.35em').text((d) => `${F.k(d.left)} · ${d.n}`);
+    g.append('title').text((d) => `${d.cat}: ${F.money(d.left)} left across ${d.n} campaigns`);
+  });
+</script>
+
+</div></body></html>

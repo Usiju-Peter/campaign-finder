@@ -1,0 +1,18 @@
+
+:root { color-scheme: dark; --color-fg:#e8eef7; --color-fg-muted:#8a9bb4; --color-bg:#0a1220; --color-panel:#101b2d; --color-border-line:#1e2b42;
+  --color-ok:#3ecf8e; --color-warn:#f2b84b; --color-bad:#ff6b6b; --font-anthropic-sans: Manrope, system-ui, sans-serif; --font-anthropic-serif: 'IBM Plex Mono', ui-monospace, monospace;
+  --cds-radius:12px; --cds-chart-grid:#18243a; --cds-chart-axis:#2a3a56; --cds-text-secondary:#8a9bb4; --cds-surface-popover:#15233a; --cds-border:#2a3a56; --cds-shadow-popover:0 10px 30px rgba(0,0,0,.45); }
+.cf-hero { background: radial-gradient(900px 300px at 10% 0%, rgba(242,184,75,.16), transparent 60%), linear-gradient(180deg, #0e1a2e, #0a1220); border: 1px solid #1e2b42; }
+.cf-hero h1 { font-family: Manrope, sans-serif !important; font-weight: 800 !important; letter-spacing: -.02em; font-size: 40px !important; }
+.cf-eyebrow { color: #f2b84b !important; }
+.cf-take b { color: #f2b84b !important; }
+.cf-kpi .cf-v, .cf-pick-big { color: #f2b84b; font-weight: 600; }
+.cf-kpi { border-top: 2px solid #f2b84b !important; }
+.cf-pick { background: linear-gradient(180deg, #13223a, #101b2d) !important; }
+.cf-pick:hover { box-shadow: 0 10px 30px rgba(0,0,0,.4), 0 0 0 1px #f2b84b55; }
+.cf-pick-bar i { background: linear-gradient(90deg, #f2b84b, #3ecf8e) !important; }
+.cf-table th { text-transform: uppercase; letter-spacing: .06em; font-size: 10.5px; }
+.cf-table td { font-family: 'IBM Plex Mono', monospace; font-size: 12px; }
+.cf-table td:first-child { font-family: Manrope, sans-serif; font-size: 13px; }
+.cf-chip:has(input:checked) { border-color: #f2b84b; color: #f2b84b; }
+.cf-plat-tiktok, .cf-plat-x { background: #2b3a55; }
