@@ -1,5 +1,5 @@
 name=Unslop
-fonts=Manrope:wght@400;600;800&family=IBM+Plex+Mono:wght@500;600
-colors=["#f2b84b", "#4cc9f0", "#b388ff", "#3ecf8e"]
-status=pending
-note=
+fonts=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500
+colors=["#a3a9b8", "#6b7487", "#4b5565", "#7a8296"]
+status=done
+note=Unslop pass: a near-neutral ink ramp, one amber accent kept for money and the three best picks, no gradients or glow, sentence-case labels, one number format, a main chart with a quiet ranked list beside it, and a freshness dot as the signature.

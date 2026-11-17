@@ -1,18 +1,145 @@
+/* ===== Unslop (by @heydamir, CC BY 4.0) =====
+   Product: a scouting board that shows clippers which Content Rewards campaigns have the most money left and the least competition
+   Character: exact, night-shift, quietly sharp
+   World: a trading terminal at night, ink-dark instruments under one amber reading lamp
+   Moments: the main chart, where the three best picks are the only amber marks; the money figures on the picks
+   Signature: the freshness dot beside "Updated" (green under 4 h, amber when stale) */
+:root {
+  color-scheme: dark;
+  /* ink ramp (near neutral, a trace of night blue) */
+  --deep: #07080d; --page: #0b0d14; --card: #11141c; --raised: #1a1e28;
+  --ink: #eef0f5; --ink-2: #a3a9b8; --ink-3: #7a8296;
+  --line: rgba(238, 240, 245, .08); --line-2: rgba(238, 240, 245, .14);
+  --accent: #f2b84b; --on-accent: #0b0d14; --pos: #4cc38a; --neg: #e5484d; --bar: #2a303d;
+  --ease: cubic-bezier(.22, 1, .36, 1);
+  --sans: 'IBM Plex Sans', system-ui, sans-serif; --mono: 'IBM Plex Mono', ui-monospace, monospace;
+  /* names the shared markup reads */
+  --color-fg: var(--ink); --color-fg-muted: var(--ink-2); --color-bg: var(--page); --color-panel: var(--card); --color-border-line: var(--line);
+  --color-ok: var(--pos); --color-warn: var(--accent); --color-bad: var(--neg);
+  --font-anthropic-sans: var(--sans); --font-anthropic-serif: var(--sans);
+  --cds-radius: 12px; --cds-pad-lg: 20px; --cds-gap-xs: 4px; --cds-gap-sm: 8px; --cds-gap-md: 16px; --cds-gap-lg: 24px;
+  --cds-font-size-caption: 13px; --cds-font-size-body: 14px; --cds-font-size-heading: 16px; --cds-font-size-title: 32px;
+  --cds-chart-grid: rgba(238, 240, 245, .06); --cds-chart-axis: rgba(238, 240, 245, .14); --cds-text-secondary: var(--ink-3);
+  --cds-surface-popover: var(--raised); --cds-border: var(--line-2); --cds-shadow-popover: 0 8px 24px rgba(0, 0, 0, .4);
+}
+body { background: var(--page); color: var(--ink); font-family: var(--sans); -webkit-font-smoothing: antialiased; }
+#dash-root { max-width: 1600px !important; }
+::selection { background: rgba(242, 184, 75, .28); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
-:root { color-scheme: dark; --color-fg:#e8eef7; --color-fg-muted:#8a9bb4; --color-bg:#0a1220; --color-panel:#101b2d; --color-border-line:#1e2b42;
-  --color-ok:#3ecf8e; --color-warn:#f2b84b; --color-bad:#ff6b6b; --font-anthropic-sans: Manrope, system-ui, sans-serif; --font-anthropic-serif: 'IBM Plex Mono', ui-monospace, monospace;
-  --cds-radius:12px; --cds-chart-grid:#18243a; --cds-chart-axis:#2a3a56; --cds-text-secondary:#8a9bb4; --cds-surface-popover:#15233a; --cds-border:#2a3a56; --cds-shadow-popover:0 10px 30px rgba(0,0,0,.45); }
-.cf-hero { background: radial-gradient(900px 300px at 10% 0%, rgba(242,184,75,.16), transparent 60%), linear-gradient(180deg, #0e1a2e, #0a1220); border: 1px solid #1e2b42; }
-.cf-hero h1 { font-family: Manrope, sans-serif !important; font-weight: 800 !important; letter-spacing: -.02em; font-size: 40px !important; }
-.cf-eyebrow { color: #f2b84b !important; }
-.cf-take b { color: #f2b84b !important; }
-.cf-kpi .cf-v, .cf-pick-big { color: #f2b84b; font-weight: 600; }
-.cf-kpi { border-top: 2px solid #f2b84b !important; }
-.cf-pick { background: linear-gradient(180deg, #13223a, #101b2d) !important; }
-.cf-pick:hover { box-shadow: 0 10px 30px rgba(0,0,0,.4), 0 0 0 1px #f2b84b55; }
-.cf-pick-bar i { background: linear-gradient(90deg, #f2b84b, #3ecf8e) !important; }
-.cf-table th { text-transform: uppercase; letter-spacing: .06em; font-size: 10.5px; }
-.cf-table td { font-family: 'IBM Plex Mono', monospace; font-size: 12px; }
-.cf-table td:first-child { font-family: Manrope, sans-serif; font-size: 13px; }
-.cf-chip:has(input:checked) { border-color: #f2b84b; color: #f2b84b; }
-.cf-plat-tiktok, .cf-plat-x { background: #2b3a55; }
+/* 1. spacing on the 4px grid; 6. app proportions: a 248 sidebar, fluid content */
+@media (min-width: 1000px) { .cf-shell { grid-template-columns: 248px minmax(0, 1fr) !important; } }
+.cf { gap: 32px !important; }
+.cf-side { background: var(--deep) !important; border: 1px solid var(--line) !important; border-radius: 16px !important; padding: 16px 12px !important; gap: 16px !important; }
+.cf-brand { gap: 8px !important; padding: 0 8px; font-weight: 600 !important; font-size: 16px !important; letter-spacing: 0; }
+.cf-mark { width: 16px !important; height: 16px !important; border-radius: 4px !important; background: var(--accent) !important; }
+.cf-nav { gap: 4px !important; }
+.cf-nav a { height: 32px; display: flex; align-items: center; padding: 0 8px !important; border-radius: 8px !important; font-size: 14px !important; color: var(--ink-2) !important;
+  transition: background-color 150ms var(--ease), color 150ms var(--ease); }
+.cf-nav a:hover { background: var(--card) !important; color: var(--ink) !important; }
+.cf-nav a.cf-active { background: var(--raised) !important; color: var(--ink) !important; font-weight: 500 !important; box-shadow: inset 0 1px 0 rgba(255, 255, 255, .06) !important; }
+.cf-sidefoot { display: flex; align-items: center; gap: 8px; padding: 12px 8px 0 !important; font-size: 12px; color: var(--ink-3) !important; border-top-color: var(--line) !important; }
+
+/* 2. color: neutral surfaces, depth from steps and hairlines, no gradients or glow */
+.cf-hero { background: none !important; border: 0 !important; padding: 24px 0 8px !important; }
+.cf-panel, .cf-pick { background: var(--card) !important; border: 1px solid var(--line) !important; box-shadow: none !important; }
+.cf-pick:hover { background: var(--raised) !important; transform: none !important; }
+.cf-pick-bar { background: var(--raised) !important; height: 4px !important; }
+.cf-pick-bar i { background: var(--ink-3) !important; }
+.cf-pick:first-child .cf-pick-bar i { background: var(--accent) !important; }
+
+/* 5. type: Plex Sans 400/500, figures in Plex Mono, sentence case, no heavy headings */
+.cf-hero h1 { font-family: var(--sans) !important; font-weight: 500 !important; font-size: 32px !important; letter-spacing: -.01em !important; line-height: 1.15; margin: 0 0 8px !important; }
+.cf-take { font-size: 15px; color: var(--ink-2) !important; max-width: 64ch; }
+.cf-take b { color: var(--ink) !important; font-weight: 500; }
+.cf-hint { color: var(--ink-3) !important; font-size: 13px; }
+.cf-hero .cf-hint { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+.cf-sechead h2, .cf-charts h2, .cf-tablehead h2 { font-size: 16px !important; font-weight: 500 !important; letter-spacing: 0 !important; margin-bottom: 4px; }
+.cf-v, .cf-pick-big, .cf-table td:nth-child(n+4), .cf-pick-meta b, .cf-dk-count, .cf-tog em { font-family: var(--mono) !important; font-variant-numeric: tabular-nums; }
+.cf-table th, .cf-pop-label { text-transform: none !important; letter-spacing: 0 !important; font-size: 12px !important; font-weight: 400 !important; color: var(--ink-3) !important; }
+
+/* 7. stat cards are numbers: label, figure; one key figure carries the accent */
+.cf-kpis { gap: 16px !important; }
+.cf-kpi { border-top: 1px solid var(--line) !important; padding: 16px 20px !important; }
+.cf-kpi .cf-k { font-size: 13px; color: var(--ink-2) !important; }
+.cf-kpi .cf-v { font-size: 28px !important; font-weight: 500 !important; color: var(--ink) !important; margin-top: 8px !important; }
+.cf-kpi:nth-child(2) .cf-v { color: var(--accent) !important; }
+.cf-kpi .cf-s { color: var(--ink-3) !important; font-size: 12px; }
+
+/* picks */
+.cf-pickgrid { gap: 16px !important; }
+.cf-pick { padding: 20px !important; border-radius: 12px !important; gap: 4px !important; }
+.cf-pick-title { font-weight: 500 !important; font-size: 15px; }
+.cf-pick-org, .cf-pick-biglabel { color: var(--ink-3) !important; font-size: 13px; }
+.cf-pick-big { font-size: 28px !important; font-weight: 500 !important; color: var(--ink) !important; margin-top: 12px !important; }
+.cf-pick:first-child .cf-pick-big { color: var(--accent) !important; }
+.cf-pick-rank { font-family: var(--mono); font-size: 12px !important; color: var(--ink-3) !important; top: 20px !important; right: 20px !important; }
+.cf-pick-meta { gap: 4px 16px !important; color: var(--ink-3) !important; font-size: 13px !important; }
+.cf-pick-meta b { color: var(--ink-2) !important; font-weight: 500 !important; }
+
+/* charts: one main chart, a smaller ranked list beside it */
+.cf-charts-main { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) !important; gap: 16px !important; }
+@media (max-width: 1000px) { .cf-charts-main { grid-template-columns: minmax(0, 1fr) !important; } }
+.cf-chart { min-height: 340px !important; }
+#map .cf-chart { min-height: 380px !important; }
+.cf-chart svg text { font-family: var(--mono) !important; font-size: 11px !important; fill: var(--ink-3) !important; }
+.cf-dot { stroke: var(--page) !important; }
+.cf-dot.cf-best { stroke: var(--page) !important; stroke-width: 2px !important; }
+.cf-legend { gap: 16px !important; color: var(--ink-3) !important; font-size: 12px !important; }
+.cf-legend i { width: 8px !important; height: 8px !important; margin-right: 6px !important; vertical-align: 0 !important; }
+
+/* table: quiet header, quiet platform text, rows that read apart */
+.cf-table th, .cf-table td { padding: 8px 12px !important; border-bottom-color: var(--line) !important; }
+.cf-table tbody tr td { transition: background-color 150ms var(--ease); }
+.cf-table tbody tr:hover td { background: var(--raised); }
+.cf-th.cf-sorted { color: var(--ink) !important; }
+.cf-table a { color: var(--ink) !important; font-weight: 500 !important; }
+.cf-org { color: var(--ink-3) !important; font-size: 12px; }
+.cf-plat { background: none !important; color: var(--ink-2) !important; box-shadow: none !important; font-family: var(--mono); font-weight: 400 !important; font-size: 12px !important; padding: 0 !important; margin-right: 8px !important; min-width: 0 !important; }
+.cf-ratecell { font-weight: 400 !important; } .cf-rate-hi { color: var(--ink) !important; } .cf-rate-mid { color: var(--ink-2) !important; } .cf-rate-lo { color: var(--ink-3) !important; }
+.cf-pill { border-radius: 4px !important; padding: 0 4px !important; font-size: 11px !important; font-family: var(--mono); border-color: var(--line-2) !important; color: var(--ink-3) !important; }
+.cf-pill.cf-ok, .cf-pill.cf-warn, .cf-pill.cf-bad { border-color: var(--line-2) !important; }
+.cf-pill.cf-ok { color: var(--pos) !important; } .cf-pill.cf-bad { color: var(--neg) !important; } .cf-pill.cf-warn { color: var(--ink-2) !important; }
+
+/* top bar: same ramp, radius by size (panel 14, controls 8) */
+.cf-dock { background: var(--card) !important; border: 1px solid var(--line) !important; border-radius: 14px !important; padding: 4px !important; gap: 4px !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .35) !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; color: var(--ink) !important; font-size: 14px !important; }
+.cf-dk-seg { background: var(--deep) !important; border-radius: 10px !important; padding: 2px !important; }
+.cf-seg { border-radius: 8px !important; padding: 0 12px !important; height: 32px; color: var(--ink-3) !important; }
+.cf-seg[aria-pressed="true"] { background: var(--raised) !important; color: var(--ink) !important; font-weight: 500 !important; box-shadow: inset 0 1px 0 rgba(255, 255, 255, .06); }
+.cf-dk-btn { border-radius: 8px !important; height: 36px; padding: 0 12px !important; gap: 8px !important; color: var(--ink-2); }
+.cf-dk-btn svg, .cf-dk-icon svg { color: var(--ink-3); }
+.cf-dk-btn:hover, .cf-dk-btn[aria-expanded="true"] { background: var(--raised) !important; color: var(--ink); }
+.cf-badge { background: none !important; color: var(--accent) !important; font-family: var(--mono); min-width: 0 !important; padding: 0 !important; height: auto !important; font-weight: 500 !important; font-size: 12px !important; }
+.cf-dk-icon { width: 36px !important; height: 36px !important; border-radius: 8px !important; color: var(--ink-3) !important; }
+.cf-dk-icon:hover { background: var(--raised) !important; color: var(--ink) !important; }
+.cf-dk-icon[aria-pressed="true"] { background: var(--raised) !important; color: var(--accent) !important; box-shadow: inset 0 0 0 1px var(--line-2); }
+.cf-dk-icon[aria-pressed="true"] svg { color: var(--accent); }
+.cf-dk-sep { background: var(--line-2) !important; }
+.cf-dk-clear, .cf-dk-count { color: var(--ink-3) !important; }
+.cf-pop { background: var(--raised) !important; border: 1px solid var(--line-2) !important; border-radius: 14px !important; padding: 8px !important; color: var(--ink) !important;
+  display: block !important; visibility: hidden; opacity: 0; transform: translateY(-6px); box-shadow: 0 12px 32px rgba(0, 0, 0, .45) !important;
+  transition: opacity 160ms var(--ease), transform 200ms var(--ease), visibility 0s linear 200ms; }
+.cf-pop.cf-open { visibility: visible; opacity: 1; transform: none; transition: opacity 160ms var(--ease), transform 200ms var(--ease), visibility 0s; }
+@media (max-width: 1239px) { .cf-pop { transform: translateX(-50%) translateY(-6px); } .cf-pop.cf-open { transform: translateX(-50%); } }
+.cf-opt, .cf-tog { border-radius: 6px !important; }
+.cf-opt:hover, .cf-tog:hover { background: var(--card) !important; }
+.cf-opt[aria-pressed="true"] { background: var(--card) !important; color: var(--accent); font-weight: 500 !important; }
+.cf-preset { border-radius: 8px !important; border-color: var(--line-2) !important; }
+.cf-preset[aria-pressed="true"] { background: var(--ink) !important; color: var(--page) !important; border-color: var(--ink) !important; }
+.cf-pop input[type=search] { background: var(--card) !important; border-color: var(--line-2) !important; border-radius: 6px !important; }
+.cf-tog input { accent-color: var(--accent) !important; }
+.cf-btn { border-radius: 8px !important; height: 36px; background: var(--raised) !important; border-color: var(--line-2) !important; color: var(--ink) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .06); transition: background-color 150ms var(--ease), transform 120ms var(--ease); }
+.cf-btn:active, .cf-dk-btn:active, .cf-seg:active, .cf-dk-icon:active, .cf-preset:active { transform: scale(.97); }
+
+/* signature: the freshness dot */
+.cf-fresh { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--pos); box-shadow: 0 0 0 3px rgba(76, 195, 138, .18); flex: none; }
+.cf-fresh.cf-stale { background: var(--accent); box-shadow: 0 0 0 3px rgba(242, 184, 75, .18); }
+
+/* 9. motion: one curve, named properties, nothing loops */
+@media (prefers-reduced-motion: reduce) { * { transition-duration: 0ms !important; animation: none !important; } }
+
+#cats svg text { font-family: var(--sans) !important; font-size: 12px !important; }
+#cats svg text:last-of-type { font-family: var(--mono) !important; }
+.cf-hero h1 { max-width: 24ch; text-wrap: balance; }
