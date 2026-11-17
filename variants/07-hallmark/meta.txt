@@ -1,5 +1,6 @@
 name=Hallmark
-fonts=Manrope:wght@400;600;800&family=IBM+Plex+Mono:wght@500;600
-colors=["#f2b84b", "#4cc9f0", "#b388ff", "#3ecf8e"]
-status=pending
-note=
+fonts=Manrope:wght@400;500;600;700;800
+colors=["var(--color-accent)", "var(--color-series-2)", "var(--color-series-3)", "var(--color-series-4)"]
+status=done
+note=Hallmark redesign as an app screen: every colour and font a token, the ledger leads, figures in one strip, no tracked caps, no dot-joined meta, loading skeleton, empty and error states, filters in the URL with undo.
+nobase=1
