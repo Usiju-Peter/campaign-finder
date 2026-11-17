@@ -16,3 +16,77 @@
 .cf-table td:first-child { font-family: Manrope, sans-serif; font-size: 13px; }
 .cf-chip:has(input:checked) { border-color: #f2b84b; color: #f2b84b; }
 .cf-plat-tiktok, .cf-plat-x { background: #2b3a55; }
+
+/* ===== Taste pass =====
+   Motion tokens from the taste-skill motion layer: one UI ease-out, no bounce or overshoot.
+   Card lift 2px, button step 1px, press 1px + scale .985, menu drop 6px, underline draws. */
+:root { --ease: cubic-bezier(.2,.8,.2,1); --m-ease-enter: cubic-bezier(.22,1,.36,1);
+  --m-in: 150ms; --m-out: 120ms; --m-press: 90ms; --m-panel: 200ms; --m-close: 120ms;
+  --gold:#f2b84b; --ink:#e8eef7; --mute:#8a9bb4; --line:#1e2b42; --panel:#101b2d; }
+/* no violet anywhere: the logo mark becomes flat gold */
+.cf-mark { background: var(--gold) !important; border-radius: 6px !important; }
+.cf-hero { background: var(--panel) !important; border: 1px solid var(--line) !important; }
+.cf-hero h1 { font-size: 42px !important; max-width: 20ch; text-wrap: balance; letter-spacing: -.03em; }
+.cf-pick { background: var(--panel) !important; }
+.cf-pick-bar i { background: var(--gold) !important; }
+.cf-kpi { border-top: 1px solid var(--line) !important; }
+
+/* hero entrance, once on load: the heading, then its lead, then what to do */
+@media (prefers-reduced-motion: no-preference) {
+  [data-enter] > * { animation: t-enter 1.1s var(--m-ease-enter) both; }
+  [data-enter] > h1 { animation-delay: 0ms; }
+  [data-enter] > .cf-take { animation-delay: 140ms; }
+  [data-enter] > :not(h1):not(.cf-take) { animation-delay: 260ms; }
+  @keyframes t-enter { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+}
+
+/* hover layer: fine pointer only; keyboard focus shows the same state */
+@media (hover: hover) and (pointer: fine) {
+  .cf-btn:hover, .cf-dk-btn:hover, .cf-preset:hover { transform: translateY(-1px); }
+  .cf-pick.m-card:hover { transform: translateY(-2px); border-color: #2e3f5c !important; box-shadow: 0 10px 24px rgba(232,238,247,.06) !important; }
+  .cf-table a:hover { background-size: 100% 1px; }
+  .cf-nav a:hover { color: var(--ink); }
+}
+.cf-btn, .cf-dk-btn, .cf-preset, .cf-seg, .cf-dk-icon, .cf-opt {
+  transition: transform var(--m-in) var(--ease), background-color var(--m-in) var(--ease), color var(--m-in) var(--ease), border-color var(--m-in) var(--ease); }
+.cf-btn:active, .cf-dk-btn:active, .cf-preset:active, .cf-seg:active, .cf-dk-icon:active { transform: translateY(1px) scale(.985); transition-duration: var(--m-press); }
+.cf-pick { transition: transform 180ms var(--ease), box-shadow 180ms var(--ease), border-color 180ms var(--ease) !important; }
+.cf-pick:hover { box-shadow: none; }
+/* links: one look, underline draws left to right */
+.cf-table a { background: linear-gradient(currentColor, currentColor) 0 100% / 0 1px no-repeat; transition: background-size var(--m-in) var(--ease); text-decoration: none !important; }
+.cf-table a:focus-visible { background-size: 100% 1px; }
+/* current section: a 2px bar, still */
+.cf-nav a.cf-active { box-shadow: inset 2px 0 0 var(--gold) !important; }
+
+/* menus: drop 6px and fade in 200ms, close in 120ms */
+.cf-pop { display: block !important; visibility: hidden; opacity: 0; transform: translateY(-6px);
+  transition: opacity var(--m-close) var(--ease), transform var(--m-close) var(--ease), visibility 0s linear var(--m-close); }
+.cf-pop.cf-open { visibility: visible; opacity: 1; transform: none; transition: opacity var(--m-panel) var(--ease), transform var(--m-panel) var(--ease), visibility 0s; }
+@media (max-width: 1239px) { .cf-pop { transform: translateX(-50%) translateY(-6px); } .cf-pop.cf-open { transform: translateX(-50%); } }
+
+/* real icons keep their own colours; pressed shows as a gold ring, never a recolour */
+.cf-dk-icon { opacity: .78; }
+.cf-dk-icon:hover { opacity: 1; background: rgba(255,255,255,.06) !important; }
+.cf-dk-icon[aria-pressed="true"] { opacity: 1; background: rgba(242,184,75,.14) !important; box-shadow: inset 0 0 0 2px var(--gold); }
+.cf-plat-tiktok { background: #000 !important; box-shadow: inset 0 -2px 0 #fe2c55; }
+.cf-plat-instagram { background: linear-gradient(45deg, #fd5949, #d6249f 60%, #285aeb) !important; }
+.cf-plat-youtube { background: #ff0000 !important; }
+.cf-plat-x { background: #000 !important; box-shadow: inset 0 0 0 1px #3a4b68; }
+.cf-plat-facebook { background: #1877f2 !important; }
+
+/* keyboard: skip link first, focus ring never under the bar */
+.cf-skip { position: absolute; left: 16px; top: -60px; z-index: 100; background: var(--gold); color: #0a1220; padding: 10px 14px; border-radius: 10px; font-weight: 700; text-decoration: none; }
+.cf-skip:focus { top: 12px; }
+:focus-visible { outline: 2px solid var(--gold) !important; outline-offset: 2px; }
+#list, #picks, #kpis, #map, #cats { scroll-margin-top: 90px; }
+
+/* phone: every control at least 44px tall */
+@media (max-width: 860px) {
+  .cf-seg, .cf-dk-btn { min-height: 44px; }
+  .cf-dk-icon { width: 44px; height: 44px; }
+  .cf-nav a { min-height: 44px; display: inline-flex; align-items: center; }
+  .cf-btn { min-height: 44px; }
+  .cf-preset, .cf-opt, .cf-tog { min-height: 44px; }
+}
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+.cf-hero h1 { font-size: clamp(30px, 4.4vw, 46px) !important; line-height: 1.06 !important; margin: 0 0 14px !important; }

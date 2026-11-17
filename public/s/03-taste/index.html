@@ -27,9 +27,83 @@ body { margin: 0; background: var(--color-bg); color: var(--color-fg); font: 14p
 .cf-table td:first-child { font-family: Manrope, sans-serif; font-size: 13px; }
 .cf-chip:has(input:checked) { border-color: #f2b84b; color: #f2b84b; }
 .cf-plat-tiktok, .cf-plat-x { background: #2b3a55; }
+
+/* ===== Taste pass =====
+   Motion tokens from the taste-skill motion layer: one UI ease-out, no bounce or overshoot.
+   Card lift 2px, button step 1px, press 1px + scale .985, menu drop 6px, underline draws. */
+:root { --ease: cubic-bezier(.2,.8,.2,1); --m-ease-enter: cubic-bezier(.22,1,.36,1);
+  --m-in: 150ms; --m-out: 120ms; --m-press: 90ms; --m-panel: 200ms; --m-close: 120ms;
+  --gold:#f2b84b; --ink:#e8eef7; --mute:#8a9bb4; --line:#1e2b42; --panel:#101b2d; }
+/* no violet anywhere: the logo mark becomes flat gold */
+.cf-mark { background: var(--gold) !important; border-radius: 6px !important; }
+.cf-hero { background: var(--panel) !important; border: 1px solid var(--line) !important; }
+.cf-hero h1 { font-size: 42px !important; max-width: 20ch; text-wrap: balance; letter-spacing: -.03em; }
+.cf-pick { background: var(--panel) !important; }
+.cf-pick-bar i { background: var(--gold) !important; }
+.cf-kpi { border-top: 1px solid var(--line) !important; }
+
+/* hero entrance, once on load: the heading, then its lead, then what to do */
+@media (prefers-reduced-motion: no-preference) {
+  [data-enter] > * { animation: t-enter 1.1s var(--m-ease-enter) both; }
+  [data-enter] > h1 { animation-delay: 0ms; }
+  [data-enter] > .cf-take { animation-delay: 140ms; }
+  [data-enter] > :not(h1):not(.cf-take) { animation-delay: 260ms; }
+  @keyframes t-enter { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+}
+
+/* hover layer: fine pointer only; keyboard focus shows the same state */
+@media (hover: hover) and (pointer: fine) {
+  .cf-btn:hover, .cf-dk-btn:hover, .cf-preset:hover { transform: translateY(-1px); }
+  .cf-pick.m-card:hover { transform: translateY(-2px); border-color: #2e3f5c !important; box-shadow: 0 10px 24px rgba(232,238,247,.06) !important; }
+  .cf-table a:hover { background-size: 100% 1px; }
+  .cf-nav a:hover { color: var(--ink); }
+}
+.cf-btn, .cf-dk-btn, .cf-preset, .cf-seg, .cf-dk-icon, .cf-opt {
+  transition: transform var(--m-in) var(--ease), background-color var(--m-in) var(--ease), color var(--m-in) var(--ease), border-color var(--m-in) var(--ease); }
+.cf-btn:active, .cf-dk-btn:active, .cf-preset:active, .cf-seg:active, .cf-dk-icon:active { transform: translateY(1px) scale(.985); transition-duration: var(--m-press); }
+.cf-pick { transition: transform 180ms var(--ease), box-shadow 180ms var(--ease), border-color 180ms var(--ease) !important; }
+.cf-pick:hover { box-shadow: none; }
+/* links: one look, underline draws left to right */
+.cf-table a { background: linear-gradient(currentColor, currentColor) 0 100% / 0 1px no-repeat; transition: background-size var(--m-in) var(--ease); text-decoration: none !important; }
+.cf-table a:focus-visible { background-size: 100% 1px; }
+/* current section: a 2px bar, still */
+.cf-nav a.cf-active { box-shadow: inset 2px 0 0 var(--gold) !important; }
+
+/* menus: drop 6px and fade in 200ms, close in 120ms */
+.cf-pop { display: block !important; visibility: hidden; opacity: 0; transform: translateY(-6px);
+  transition: opacity var(--m-close) var(--ease), transform var(--m-close) var(--ease), visibility 0s linear var(--m-close); }
+.cf-pop.cf-open { visibility: visible; opacity: 1; transform: none; transition: opacity var(--m-panel) var(--ease), transform var(--m-panel) var(--ease), visibility 0s; }
+@media (max-width: 1239px) { .cf-pop { transform: translateX(-50%) translateY(-6px); } .cf-pop.cf-open { transform: translateX(-50%); } }
+
+/* real icons keep their own colours; pressed shows as a gold ring, never a recolour */
+.cf-dk-icon { opacity: .78; }
+.cf-dk-icon:hover { opacity: 1; background: rgba(255,255,255,.06) !important; }
+.cf-dk-icon[aria-pressed="true"] { opacity: 1; background: rgba(242,184,75,.14) !important; box-shadow: inset 0 0 0 2px var(--gold); }
+.cf-plat-tiktok { background: #000 !important; box-shadow: inset 0 -2px 0 #fe2c55; }
+.cf-plat-instagram { background: linear-gradient(45deg, #fd5949, #d6249f 60%, #285aeb) !important; }
+.cf-plat-youtube { background: #ff0000 !important; }
+.cf-plat-x { background: #000 !important; box-shadow: inset 0 0 0 1px #3a4b68; }
+.cf-plat-facebook { background: #1877f2 !important; }
+
+/* keyboard: skip link first, focus ring never under the bar */
+.cf-skip { position: absolute; left: 16px; top: -60px; z-index: 100; background: var(--gold); color: #0a1220; padding: 10px 14px; border-radius: 10px; font-weight: 700; text-decoration: none; }
+.cf-skip:focus { top: 12px; }
+:focus-visible { outline: 2px solid var(--gold) !important; outline-offset: 2px; }
+#list, #picks, #kpis, #map, #cats { scroll-margin-top: 90px; }
+
+/* phone: every control at least 44px tall */
+@media (max-width: 860px) {
+  .cf-seg, .cf-dk-btn { min-height: 44px; }
+  .cf-dk-icon { width: 44px; height: 44px; }
+  .cf-nav a { min-height: 44px; display: inline-flex; align-items: center; }
+  .cf-btn { min-height: 44px; }
+  .cf-preset, .cf-opt, .cf-tog { min-height: 44px; }
+}
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+.cf-hero h1 { font-size: clamp(30px, 4.4vw, 46px) !important; line-height: 1.06 !important; margin: 0 0 14px !important; }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
-<script>window.__COLORS = ["#f2b84b", "#4cc9f0", "#b388ff", "#3ecf8e"]; window.__DATA_URL = '../../data/campaigns.json';</script>
+<script>window.__COLORS = ["#f2b84b", "#4cc9f0", "#3ecf8e", "#ff8a5c"]; window.__DATA_URL = '../../data/campaigns.json';</script>
 <script>// Minimal stand-in for the dashboard runtime: loads the data file and reruns every drawing.
 window.dash = (() => {
   const data = { campaigns: { status: 'loading', data: [], message: '', refreshing: false, truncated: false, meta: [] } };
@@ -212,6 +286,7 @@ window.dash = (() => {
   }
 </style>
 
+  <a class="cf-skip" href="#list">Skip to the campaign list</a>
   <div class="cf-dock" role="toolbar" aria-label="Filter and sort campaigns">
     <div class="cf-dk-seg" role="group" aria-label="Type">
       <button type="button" class="cf-seg" data-type="" aria-pressed="true">All</button><button type="button" class="cf-seg" data-type="Clipping" aria-pressed="false">Clipping</button><button type="button" class="cf-seg" data-type="UGC" aria-pressed="false">UGC</button><button type="button" class="cf-seg" data-type="Slideshow" aria-pressed="false">Slideshow</button>
@@ -226,9 +301,9 @@ window.dash = (() => {
       <div class="cf-pop cf-pop-wide" id="pop-budget"><div class="cf-pop-group"><p class="cf-pop-label">Budget left</p><div class="cf-presets"><button type="button" class="cf-preset" data-k="minLeft" data-v="" aria-pressed="false">Any</button><button type="button" class="cf-preset" data-k="minLeft" data-v="1500" aria-pressed="false">$1.5K+</button><button type="button" class="cf-preset" data-k="minLeft" data-v="5000" aria-pressed="false">$5K+</button><button type="button" class="cf-preset" data-k="minLeft" data-v="10000" aria-pressed="false">$10K+</button><button type="button" class="cf-preset" data-k="minLeft" data-v="25000" aria-pressed="false">$25K+</button></div></div><div class="cf-pop-group"><p class="cf-pop-label">Creators competing</p><div class="cf-presets"><button type="button" class="cf-preset" data-k="maxCr" data-v="" aria-pressed="false">Any</button><button type="button" class="cf-preset" data-k="maxCr" data-v="10" aria-pressed="false">10 or fewer</button><button type="button" class="cf-preset" data-k="maxCr" data-v="25" aria-pressed="false">25 or fewer</button><button type="button" class="cf-preset" data-k="maxCr" data-v="50" aria-pressed="false">50 or fewer</button><button type="button" class="cf-preset" data-k="maxCr" data-v="100" aria-pressed="false">100 or fewer</button></div></div><div class="cf-pop-group"><p class="cf-pop-label">Pay per 1K views</p><div class="cf-presets"><button type="button" class="cf-preset" data-k="minRate" data-v="" aria-pressed="false">Any</button><button type="button" class="cf-preset" data-k="minRate" data-v="1" aria-pressed="false">$1+</button><button type="button" class="cf-preset" data-k="minRate" data-v="1.5" aria-pressed="false">$1.50+</button><button type="button" class="cf-preset" data-k="minRate" data-v="2" aria-pressed="false">$2+</button><button type="button" class="cf-preset" data-k="minRate" data-v="3" aria-pressed="false">$3+</button></div></div><div class="cf-pop-group"><p class="cf-pop-label">Launched</p><div class="cf-presets"><button type="button" class="cf-preset" data-k="maxAge" data-v="" aria-pressed="false">Any time</button><button type="button" class="cf-preset" data-k="maxAge" data-v="7" aria-pressed="false">This week</button><button type="button" class="cf-preset" data-k="maxAge" data-v="30" aria-pressed="false">This month</button></div></div></div></div>
     <div class="cf-dk-item"><button type="button" class="cf-dk-btn" data-pop="pop-more" aria-expanded="false"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg>Filters<span class="cf-badge" data-draw="b-more"></span></button>
       <div class="cf-pop cf-pop-wide" id="pop-more"><p class="cf-pop-label">Show / hide</p><label class="cf-tog"><input type="checkbox" id="f-zero" checked><span>Hide campaigns nobody joined</span></label><label class="cf-tog"><input type="checkbox" id="f-gamb" checked><span>Hide casino &amp; betting</span></label><label class="cf-tog"><input type="checkbox" id="f-nonen" checked><span>Hide non-English / regional</span></label><label class="cf-tog"><input type="checkbox" id="f-face" checked><span>Hide on-camera</span></label><label class="cf-tog"><input type="checkbox" id="f-new"><span>New in the last 3 days</span></label><label class="cf-tog"><input type="checkbox" id="f-paying"><span>Already paying creators</span></label><label class="cf-tog"><input type="checkbox" id="f-podcast"><span>Podcasts only</span></label><label class="cf-tog"><input type="checkbox" id="f-cpm"><span>Pay per view only (no flat fee)</span></label></div></div>
-    <div class="cf-dk-plats" role="group" aria-label="Platforms (pays on any selected)"><button type="button" class="cf-dk-icon cf-plat-btn" data-plat="TikTok" aria-pressed="false" aria-label="TikTok" title="TikTok"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M14 3c.4 2.3 1.9 3.8 4.2 4v3c-1.6 0-3-.5-4.2-1.3v6.1A5.3 5.3 0 1 1 8.7 9.5v3.1a2.3 2.3 0 1 0 2.3 2.3V3h3z"/></svg></button><button type="button" class="cf-dk-icon cf-plat-btn" data-plat="Instagram" aria-pressed="false" aria-label="Instagram" title="Instagram"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="17.2" cy="6.8" r="1.2"/></svg></button><button type="button" class="cf-dk-icon cf-plat-btn" data-plat="YouTube" aria-pressed="false" aria-label="YouTube" title="YouTube"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M21.6 7.2a2.6 2.6 0 0 0-1.8-1.8C18.2 5 12 5 12 5s-6.2 0-7.8.4A2.6 2.6 0 0 0 2.4 7.2 27 27 0 0 0 2 12a27 27 0 0 0 .4 4.8 2.6 2.6 0 0 0 1.8 1.8c1.6.4 7.8.4 7.8.4s6.2 0 7.8-.4a2.6 2.6 0 0 0 1.8-1.8A27 27 0 0 0 22 12a27 27 0 0 0-.4-4.8zM10 15V9l5.2 3L10 15z"/></svg></button><button type="button" class="cf-dk-icon cf-plat-btn" data-plat="X" aria-pressed="false" aria-label="X" title="X"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M17.8 3h3.1l-6.8 7.8L22 21h-6.2l-4.9-6.4L5.3 21H2.2l7.3-8.3L2 3h6.4l4.4 5.8L17.8 3zm-1.1 16.2h1.7L7.4 4.7H5.6l11.1 14.5z"/></svg></button><button type="button" class="cf-dk-icon cf-plat-btn" data-plat="Facebook" aria-pressed="false" aria-label="Facebook" title="Facebook"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M13.5 21v-7.5H16l.4-3h-2.9V8.6c0-.9.3-1.5 1.5-1.5h1.5V4.4c-.3 0-1.2-.1-2.2-.1-2.2 0-3.7 1.3-3.7 3.8v2.4H8v3h2.6V21h2.9z"/></svg></button></div>
+    <div class="cf-dk-plats" role="group" aria-label="Platforms (pays on any selected)"><button type="button" class="cf-dk-icon cf-plat-btn" data-plat="TikTok" aria-pressed="false" aria-label="TikTok" title="TikTok"><svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><path fill="#25F4EE" d="M13.2 2.6h2.6c.3 2 1.6 3.4 3.6 3.7v2.7a6.4 6.4 0 0 1-3.6-1.1v6.2a5 5 0 1 1-5-5v2.7a2.3 2.3 0 1 0 2.4 2.3V2.6z" transform="translate(-.8 -.6)"/><path fill="#FE2C55" d="M13.2 2.6h2.6c.3 2 1.6 3.4 3.6 3.7v2.7a6.4 6.4 0 0 1-3.6-1.1v6.2a5 5 0 1 1-5-5v2.7a2.3 2.3 0 1 0 2.4 2.3V2.6z" transform="translate(.8 .6)"/><path fill="#fff" d="M13.2 2.6h2.6c.3 2 1.6 3.4 3.6 3.7v2.7a6.4 6.4 0 0 1-3.6-1.1v6.2a5 5 0 1 1-5-5v2.7a2.3 2.3 0 1 0 2.4 2.3V2.6z"/></svg></button><button type="button" class="cf-dk-icon cf-plat-btn" data-plat="Instagram" aria-pressed="false" aria-label="Instagram" title="Instagram"><svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><defs><radialGradient id="igg" cx="30%" cy="107%" r="150%"><stop offset="0" stop-color="#fdf497"/><stop offset=".05" stop-color="#fdf497"/><stop offset=".45" stop-color="#fd5949"/><stop offset=".6" stop-color="#d6249f"/><stop offset=".9" stop-color="#285AEB"/></radialGradient></defs><rect x="2" y="2" width="20" height="20" rx="6" fill="url(#igg)"/><rect x="6" y="6" width="12" height="12" rx="4" fill="none" stroke="#fff" stroke-width="1.8"/><circle cx="12" cy="12" r="3" fill="none" stroke="#fff" stroke-width="1.8"/><circle cx="16.6" cy="7.4" r="1.1" fill="#fff"/></svg></button><button type="button" class="cf-dk-icon cf-plat-btn" data-plat="YouTube" aria-pressed="false" aria-label="YouTube" title="YouTube"><svg viewBox="0 0 24 24" width="21" height="21" aria-hidden="true"><rect x="1.5" y="5" width="21" height="14" rx="4.2" fill="#FF0000"/><path d="M10 9v6l5.2-3z" fill="#fff"/></svg></button><button type="button" class="cf-dk-icon cf-plat-btn" data-plat="X" aria-pressed="false" aria-label="X" title="X"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><rect width="24" height="24" rx="5" fill="#000"/><path fill="#fff" d="M15.9 5.5h2l-4.4 5 5.1 6.9h-4l-3.1-4.1-3.6 4.1h-2l4.7-5.4-4.9-6.5h4.1l2.8 3.8 3.3-3.8zm-.7 10.6h1.1L8.9 6.7H7.7l7.5 9.4z"/></svg></button><button type="button" class="cf-dk-icon cf-plat-btn" data-plat="Facebook" aria-pressed="false" aria-label="Facebook" title="Facebook"><svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><circle cx="12" cy="12" r="10.5" fill="#1877F2"/><path fill="#fff" d="M13.3 22.4v-7.3h2.4l.4-2.9h-2.8v-1.8c0-.8.3-1.4 1.4-1.4h1.5V6.4c-.3 0-1.1-.1-2.2-.1-2.2 0-3.6 1.3-3.6 3.7v2.2H8v2.9h2.4v7.3h2.9z"/></svg></button></div>
     <span class="cf-dk-sep" aria-hidden="true"></span>
-    <button type="button" class="cf-dk-btn cf-dk-clear" id="f-reset">Clear</button>
+    <button type="button" class="cf-dk-btn cf-dk-clear" id="f-reset">Clear filters</button>
     <span class="cf-dk-count" data-draw="b-count">—</span>
   </div>
 <div class="cf-shell">
@@ -241,9 +316,8 @@ window.dash = (() => {
     <p class="cf-sidefoot" data-draw="side-updated">—</p>
   </aside>
 <div class="cf" data-source="campaigns">
-  <header class="cf-head cf-hero" id="top">
-    <p class="cf-eyebrow">Content Rewards · refreshed every 4 hours</p>
-    <h1>Campaign Finder</h1>
+  <header class="cf-head cf-hero" id="top" data-enter>
+    <h1>Content Rewards campaigns, ranked for clippers</h1>
     <p class="cf-take" data-read lang="en"><b data-draw="t-count">—</b> campaigns match your filters, with <b data-draw="t-left">—</b> still unspent. Most budget per creator: <b data-draw="t-best">—</b>.</p>
     <p class="cf-hint" data-draw="t-updated">—</p>
   </header>
@@ -304,13 +378,13 @@ window.dash = (() => {
         <tbody data-draw="rows"></tbody>
       </table>
     </div>
-    <button type="button" class="cf-btn cf-more" id="f-more">Show 100 more</button>
+    <button type="button" class="cf-btn cf-more" id="f-more">Show 100 more campaigns</button>
   </section>
 
   <details class="cf-notes" id="notes">
     <summary>How this was put together</summary>
     <p>Every campaign card on Content Rewards Discover (All campaigns) is read every 4 hours, and every campaign with $1,500 or more left was opened to read its platforms, pay per platform, min and max payout and visible rules. Campaigns with less left show only the card data, so their platforms and max payout are blank.</p>
-    <p>"Left / creator" is budget left divided by the number of creators who have joined. It is a rough measure of competition, not a forecast of earnings. "Spent / day" is how much the campaign paid out over roughly the last 24 hours. "New" means it launched or first appeared in the last 3 days. The casino, regional, on-camera and US-audience flags are keyword guesses from the title, description and visible rules. Most audience rules are hidden until you join, so check them before posting.</p>
+    <p>"Left / creator" is budget left divided by the number of creators who have joined. It is a rough measure of competition. It does not predict earnings. "Spent / day" is how much the campaign paid out over roughly the last 24 hours. "New" means it launched or first appeared in the last 3 days. The casino, regional, on-camera and US-audience flags are keyword guesses from the title, description and visible rules. Most audience rules are hidden until you join, so check them before posting.</p>
   </details>
 </div>
 </div>
@@ -487,7 +561,7 @@ window.dash = (() => {
     const top = v.filter((r) => r.paid > 0 && r.creators >= 3).sort((a, b) => b.left_per_creator - a.left_per_creator).slice(0, 3);
     if (!top.length) { const p = document.createElement('p'); p.className = 'cf-hint'; p.textContent = 'No paying campaign matches these filters.'; el.append(p); return; }
     top.forEach((r, i) => {
-      const a = document.createElement('a'); a.className = 'cf-pick'; a.href = r.url; a.target = '_blank'; a.rel = 'noopener';
+      const a = document.createElement('a'); a.className = 'cf-pick m-card'; a.href = r.url; a.target = '_blank'; a.rel = 'noopener';
       const rank = document.createElement('span'); rank.className = 'cf-pick-rank'; rank.textContent = '#' + (i + 1);
       const t = document.createElement('span'); t.className = 'cf-pick-title'; t.textContent = r.campaign;
       const o = document.createElement('span'); o.className = 'cf-pick-org'; o.textContent = `${r.org} · ${r.category}`;
