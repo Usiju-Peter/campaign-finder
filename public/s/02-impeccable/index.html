@@ -27,6 +27,62 @@ body { margin: 0; background: var(--color-bg); color: var(--color-fg); font: 14p
 .cf-table td:first-child { font-family: Manrope, sans-serif; font-size: 13px; }
 .cf-chip:has(input:checked) { border-color: #f2b84b; color: #f2b84b; }
 .cf-plat-tiktok, .cf-plat-x { background: #2b3a55; }
+
+/* ===== Impeccable polish (Operate mode: precision over expression) ===== */
+:root { --gold:#f2b84b; --ink:#e8eef7; --mute:#8a9bb4; --line:#1e2b42; --panel:#101b2d; --ease-out: cubic-bezier(.16,1,.3,1); }
+/* browser surfaces carry the design */
+::selection { background: rgba(242,184,75,.32); color: #fff; }
+html { caret-color: var(--gold); scrollbar-color: #2a3a56 #0a1220; scrollbar-width: thin; }
+::-webkit-scrollbar { width: 10px; height: 10px; } ::-webkit-scrollbar-track { background: #0a1220; }
+::-webkit-scrollbar-thumb { background: #2a3a56; border-radius: 99px; border: 2px solid #0a1220; } ::-webkit-scrollbar-thumb:hover { background: #3a4b68; }
+:focus-visible { outline: 2px solid var(--gold) !important; outline-offset: 2px; }
+a { text-underline-offset: 3px; }
+/* hero: no glow, the heading carries its own weight */
+.cf-hero { background: var(--panel) !important; border: 1px solid var(--line) !important; padding: 28px 28px 24px !important; }
+.cf-hero h1 { font-size: 38px !important; letter-spacing: -.025em; text-wrap: balance; margin-bottom: 10px !important; }
+.cf-take { font-size: 15px; max-width: 68ch; }
+/* KPI cards become one quiet stat strip (no accent borders, no card per number) */
+.cf-strip { gap: 0 !important; background: var(--panel); border: 1px solid var(--line); border-radius: var(--cds-radius); }
+.cf-strip .cf-kpi { background: none !important; border: 0 !important; border-radius: 0 !important; padding: 16px 20px !important; }
+.cf-strip .cf-kpi + .cf-kpi { border-left: 1px solid var(--line) !important; }
+.cf-strip .cf-v { font-size: 26px !important; color: var(--ink) !important; }
+@media (max-width: 700px) { .cf-strip .cf-kpi + .cf-kpi { border-left: 0 !important; border-top: 1px solid var(--line) !important; } }
+/* picks: flat cards, one accent; depth is an offset soft shadow on hover */
+.cf-pick { background: var(--panel) !important; transition: transform .25s var(--ease-out), box-shadow .25s var(--ease-out), border-color .25s; }
+.cf-pick:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(3,7,15,.5) !important; border-color: #2e3f5c !important; }
+.cf-pick-bar i { background: var(--gold) !important; }
+.cf-pick-rank { color: var(--mute) !important; }
+@media (prefers-reduced-motion: no-preference) {
+  .cf-enter { animation: cf-settle .7s var(--ease-out) both; animation-delay: calc(var(--i) * 70ms); }
+  @keyframes cf-settle { from { opacity: .35; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+}
+/* section rhythm: more space above headings than below */
+.cf-sechead h2, .cf-charts h2, .cf-tablehead h2 { margin-top: 6px !important; margin-bottom: 4px !important; letter-spacing: -.01em; }
+.cf-hint { line-height: 1.5; }
+/* menus open from their trigger instead of snapping */
+.cf-pop { display: block !important; visibility: hidden; opacity: 0; transform: translateY(-6px) scale(.98); transform-origin: top left;
+  transition: opacity .16s var(--ease-out), transform .2s var(--ease-out), visibility 0s linear .2s; }
+.cf-pop.cf-open { visibility: visible; opacity: 1; transform: none; transition: opacity .16s var(--ease-out), transform .2s var(--ease-out), visibility 0s; }
+@media (max-width: 1239px) { .cf-pop { transform: translateX(-50%) translateY(-6px); transform-origin: top center; } .cf-pop.cf-open { transform: translateX(-50%); } }
+@media (prefers-reduced-motion: reduce) { .cf-pop, .cf-pop.cf-open { transition: none; } }
+/* controls: consistent press and hover */
+.cf-dk-btn, .cf-seg, .cf-dk-icon, .cf-preset, .cf-opt, .cf-btn { transition: background-color .15s, color .15s, transform .1s; }
+.cf-dk-btn:active, .cf-seg:active, .cf-dk-icon:active, .cf-preset:active, .cf-btn:active { transform: scale(.97); }
+/* table: row hover, readable header, sorted column in the accent */
+.cf-table tbody tr td { transition: background-color .12s; }
+.cf-table tbody tr:hover td { background: #13213a; }
+.cf-table th { color: var(--mute) !important; }
+.cf-th.cf-sorted { color: var(--gold) !important; }
+/* states */
+.cf-state:empty { display: none; }
+.cf-state { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 12px 16px; border-radius: var(--cds-radius); border: 1px solid var(--line); background: var(--panel); color: var(--mute); }
+.cf-state[data-kind="error"] { border-color: var(--color-bad); color: var(--ink); }
+.cf-empty { text-align: center !important; padding: 36px 12px !important; white-space: normal !important; }
+.cf-empty p { margin: 0 0 12px; color: var(--mute); font-size: 14px; }
+.cf-chart-empty { display: grid; place-items: center; min-height: 280px; margin: 0; color: var(--mute); }
+.cf-mark { background: var(--gold) !important; border-radius: 6px !important; }
+.cf-table th { font-size: 11.5px !important; letter-spacing: .05em; }
+.cf-plat { font-size: 11px !important; }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
 <script>window.__COLORS = ["#f2b84b", "#4cc9f0", "#b388ff", "#3ecf8e"]; window.__DATA_URL = '../../data/campaigns.json';</script>
@@ -242,7 +298,6 @@ window.dash = (() => {
   </aside>
 <div class="cf" data-source="campaigns">
   <header class="cf-head cf-hero" id="top">
-    <p class="cf-eyebrow">Content Rewards · refreshed every 4 hours</p>
     <h1>Campaign Finder</h1>
     <p class="cf-take" data-read lang="en"><b data-draw="t-count">—</b> campaigns match your filters, with <b data-draw="t-left">—</b> still unspent. Most budget per creator: <b data-draw="t-best">—</b>.</p>
     <p class="cf-hint" data-draw="t-updated">—</p>
@@ -251,6 +306,7 @@ window.dash = (() => {
 
 
 
+  <div class="cf-state" data-draw="state" role="status" aria-live="polite"></div>
   <section class="cf-picks" id="picks">
     <div class="cf-sechead"><h2>Best picks right now</h2><p class="cf-hint">Most budget per creator among campaigns already paying out, with 3+ creators, under your filters.</p></div>
     <div class="cf-pickgrid" data-draw="picks" data-source="campaigns"></div>
@@ -258,11 +314,11 @@ window.dash = (() => {
 
 
 
-  <section class="cf-kpis" id="kpis" aria-label="Summary">
-    <div class="cf-panel cf-kpi"><div class="cf-k">Matching campaigns</div><div class="cf-v" data-draw="k-count">—</div><div class="cf-s" data-draw="k-count-s">—</div></div>
-    <div class="cf-panel cf-kpi"><div class="cf-k">Budget still unspent</div><div class="cf-v" data-draw="k-left">—</div><div class="cf-s" data-draw="k-left-s">—</div></div>
-    <div class="cf-panel cf-kpi"><div class="cf-k">Median pay per 1K views</div><div class="cf-v" data-draw="k-rate">—</div><div class="cf-s">best platform rate per campaign</div></div>
-    <div class="cf-panel cf-kpi"><div class="cf-k">Median creators</div><div class="cf-v" data-draw="k-cr">—</div><div class="cf-s">competing in each campaign</div></div>
+  <section class="cf-kpis cf-strip" id="kpis" aria-label="Summary">
+    <div class="cf-kpi"><div class="cf-k">Matching campaigns</div><div class="cf-v" data-draw="k-count">—</div><div class="cf-s" data-draw="k-count-s">—</div></div>
+    <div class="cf-kpi"><div class="cf-k">Budget still unspent</div><div class="cf-v" data-draw="k-left">—</div><div class="cf-s" data-draw="k-left-s">—</div></div>
+    <div class="cf-kpi"><div class="cf-k">Median pay per 1K views</div><div class="cf-v" data-draw="k-rate">—</div><div class="cf-s">best platform rate per campaign</div></div>
+    <div class="cf-kpi"><div class="cf-k">Median creators</div><div class="cf-v" data-draw="k-cr">—</div><div class="cf-s">competing in each campaign</div></div>
   </section>
 
   <section class="cf-charts">
@@ -322,7 +378,7 @@ window.dash = (() => {
     hideGamb: true, hideNonEn: true, hideFace: true, paying: false, podcast: false, cpm: false,
     brush: null, sort: 'left_per_creator', limit: 100,
   };
-  window.CF_redraw = (except) => ['b-search', 'b-cat', 'b-budget', 'b-more', 'b-count', 'cat-list', 'picks', 'side-updated', 't-updated', 't-count', 't-left', 't-best', 'k-count', 'k-count-s', 'k-left', 'k-left-s', 'k-rate', 'k-cr', 'scatter', 'bars', 'rows', 'shown']
+  window.CF_redraw = (except) => ['state', 'b-search', 'b-cat', 'b-budget', 'b-more', 'b-count', 'cat-list', 'picks', 'side-updated', 't-updated', 't-count', 't-left', 't-best', 'k-count', 'k-count-s', 'k-left', 'k-left-s', 'k-rate', 'k-cr', 'scatter', 'bars', 'rows', 'shown']
     .filter((n) => n !== except).forEach((n) => dash.draw(n));
   window.CF_rows = () => { const d = dash.data('campaigns'); return d.status === 'ok' ? d.data : null; };
   // skip: 'cat' (bars), 'brush' (scatter) for cross-filtering
@@ -480,14 +536,27 @@ window.dash = (() => {
     document.querySelectorAll('.cf-th[data-sort]').forEach((th) => th.classList.toggle('cf-sorted', th.dataset.sort === window.CF.sort));
   });
 
+  // ---------- loading / error state ----------
+  dash.draw('state', (el) => {
+    el.replaceChildren(); const d = dash.data('campaigns');
+    el.dataset.kind = d.status;
+    if (d.status === 'loading') { el.textContent = 'Loading campaigns…'; return; }
+    if (d.status === 'error') {
+      const p = document.createElement('span'); p.textContent = 'Could not load the campaign data. Check your connection, then try again.';
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'cf-btn'; b.textContent = 'Try again'; b.onclick = () => location.reload();
+      el.append(p, b);
+    }
+  });
+
   // ---------- top picks ----------
   dash.draw('picks', (el) => {
     el.replaceChildren();
     const v = view(); if (!v) { el.textContent = '—'; return; }
     const top = v.filter((r) => r.paid > 0 && r.creators >= 3).sort((a, b) => b.left_per_creator - a.left_per_creator).slice(0, 3);
     if (!top.length) { const p = document.createElement('p'); p.className = 'cf-hint'; p.textContent = 'No paying campaign matches these filters.'; el.append(p); return; }
+    const first = !window.__picksShown; window.__picksShown = true;
     top.forEach((r, i) => {
-      const a = document.createElement('a'); a.className = 'cf-pick'; a.href = r.url; a.target = '_blank'; a.rel = 'noopener';
+      const a = document.createElement('a'); a.className = 'cf-pick' + (first ? ' cf-enter' : ''); a.style.setProperty('--i', i); a.href = r.url; a.target = '_blank'; a.rel = 'noopener';
       const rank = document.createElement('span'); rank.className = 'cf-pick-rank'; rank.textContent = '#' + (i + 1);
       const t = document.createElement('span'); t.className = 'cf-pick-title'; t.textContent = r.campaign;
       const o = document.createElement('span'); o.className = 'cf-pick-org'; o.textContent = `${r.org} · ${r.category}`;
@@ -528,6 +597,13 @@ window.dash = (() => {
   dash.draw('rows', (tb) => {
     const v = view(); tb.replaceChildren();
     if (!v) return;
+    if (!v.length) {
+      const tr = document.createElement('tr'); const td = document.createElement('td'); td.colSpan = 13; td.className = 'cf-empty';
+      const p = document.createElement('p'); p.textContent = 'No campaigns match these filters.';
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'cf-btn'; b.textContent = 'Clear filters';
+      b.onclick = () => { const r = document.getElementById('f-reset'); if (r) r.click(); };
+      td.append(p, b); tr.append(td); tb.append(tr); return;
+    }
     const pill = (txt, cls) => { const s = document.createElement('span'); s.className = 'cf-pill' + (cls ? ' ' + cls : ''); s.textContent = txt; return s; };
     for (const r of window.CF_sorted(v).slice(0, window.CF.limit)) {
       const tr = document.createElement('tr'); tr.dataset.key = r.id;
@@ -567,6 +643,7 @@ window.dash = (() => {
     el.replaceChildren();
     const rows = window.CF_rows(); if (!rows) { el.textContent = '—'; return; }
     const pts = window.CF_filter(rows, 'brush');
+    if (!pts.length) { const p = document.createElement('p'); p.className = 'cf-chart-empty'; p.textContent = 'No campaigns to plot with these filters.'; el.append(p); return; }
     const W = Math.max(280, el.clientWidth), H = 320, m = { t: 10, r: 14, b: 38, l: 58 };
     const x = d3.scaleLog().domain([1, Math.max(10, d3.max(pts, (r) => r.creators + 1) || 10)]).range([m.l, W - m.r]).nice();
     const y = d3.scaleLog().domain([Math.max(100, d3.min(pts, (r) => r.left + 1) || 100), Math.max(1000, d3.max(pts, (r) => r.left + 1) || 1000)]).range([H - m.b, m.t]).nice();
@@ -614,6 +691,7 @@ window.dash = (() => {
     el.replaceChildren();
     const rows = window.CF_rows(); if (!rows) { el.textContent = '—'; return; }
     const v = window.CF_filter(rows, 'cat');
+    if (!v.length) { const p = document.createElement('p'); p.className = 'cf-chart-empty'; p.textContent = 'No campaigns to show with these filters.'; el.append(p); return; }
     const data = d3.rollups(v, (g) => ({ left: d3.sum(g, (r) => r.left), n: g.length }), (r) => r.category)
       .map(([cat, o]) => ({ cat, ...o })).sort((a, b) => b.left - a.left).slice(0, 12);
     const W = Math.max(280, el.clientWidth), bh = 22, gap = 6, H = Math.max(120, data.length * (bh + gap) + 10);

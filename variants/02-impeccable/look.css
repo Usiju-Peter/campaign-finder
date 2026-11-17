@@ -16,3 +16,59 @@
 .cf-table td:first-child { font-family: Manrope, sans-serif; font-size: 13px; }
 .cf-chip:has(input:checked) { border-color: #f2b84b; color: #f2b84b; }
 .cf-plat-tiktok, .cf-plat-x { background: #2b3a55; }
+
+/* ===== Impeccable polish (Operate mode: precision over expression) ===== */
+:root { --gold:#f2b84b; --ink:#e8eef7; --mute:#8a9bb4; --line:#1e2b42; --panel:#101b2d; --ease-out: cubic-bezier(.16,1,.3,1); }
+/* browser surfaces carry the design */
+::selection { background: rgba(242,184,75,.32); color: #fff; }
+html { caret-color: var(--gold); scrollbar-color: #2a3a56 #0a1220; scrollbar-width: thin; }
+::-webkit-scrollbar { width: 10px; height: 10px; } ::-webkit-scrollbar-track { background: #0a1220; }
+::-webkit-scrollbar-thumb { background: #2a3a56; border-radius: 99px; border: 2px solid #0a1220; } ::-webkit-scrollbar-thumb:hover { background: #3a4b68; }
+:focus-visible { outline: 2px solid var(--gold) !important; outline-offset: 2px; }
+a { text-underline-offset: 3px; }
+/* hero: no glow, the heading carries its own weight */
+.cf-hero { background: var(--panel) !important; border: 1px solid var(--line) !important; padding: 28px 28px 24px !important; }
+.cf-hero h1 { font-size: 38px !important; letter-spacing: -.025em; text-wrap: balance; margin-bottom: 10px !important; }
+.cf-take { font-size: 15px; max-width: 68ch; }
+/* KPI cards become one quiet stat strip (no accent borders, no card per number) */
+.cf-strip { gap: 0 !important; background: var(--panel); border: 1px solid var(--line); border-radius: var(--cds-radius); }
+.cf-strip .cf-kpi { background: none !important; border: 0 !important; border-radius: 0 !important; padding: 16px 20px !important; }
+.cf-strip .cf-kpi + .cf-kpi { border-left: 1px solid var(--line) !important; }
+.cf-strip .cf-v { font-size: 26px !important; color: var(--ink) !important; }
+@media (max-width: 700px) { .cf-strip .cf-kpi + .cf-kpi { border-left: 0 !important; border-top: 1px solid var(--line) !important; } }
+/* picks: flat cards, one accent; depth is an offset soft shadow on hover */
+.cf-pick { background: var(--panel) !important; transition: transform .25s var(--ease-out), box-shadow .25s var(--ease-out), border-color .25s; }
+.cf-pick:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(3,7,15,.5) !important; border-color: #2e3f5c !important; }
+.cf-pick-bar i { background: var(--gold) !important; }
+.cf-pick-rank { color: var(--mute) !important; }
+@media (prefers-reduced-motion: no-preference) {
+  .cf-enter { animation: cf-settle .7s var(--ease-out) both; animation-delay: calc(var(--i) * 70ms); }
+  @keyframes cf-settle { from { opacity: .35; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+}
+/* section rhythm: more space above headings than below */
+.cf-sechead h2, .cf-charts h2, .cf-tablehead h2 { margin-top: 6px !important; margin-bottom: 4px !important; letter-spacing: -.01em; }
+.cf-hint { line-height: 1.5; }
+/* menus open from their trigger instead of snapping */
+.cf-pop { display: block !important; visibility: hidden; opacity: 0; transform: translateY(-6px) scale(.98); transform-origin: top left;
+  transition: opacity .16s var(--ease-out), transform .2s var(--ease-out), visibility 0s linear .2s; }
+.cf-pop.cf-open { visibility: visible; opacity: 1; transform: none; transition: opacity .16s var(--ease-out), transform .2s var(--ease-out), visibility 0s; }
+@media (max-width: 1239px) { .cf-pop { transform: translateX(-50%) translateY(-6px); transform-origin: top center; } .cf-pop.cf-open { transform: translateX(-50%); } }
+@media (prefers-reduced-motion: reduce) { .cf-pop, .cf-pop.cf-open { transition: none; } }
+/* controls: consistent press and hover */
+.cf-dk-btn, .cf-seg, .cf-dk-icon, .cf-preset, .cf-opt, .cf-btn { transition: background-color .15s, color .15s, transform .1s; }
+.cf-dk-btn:active, .cf-seg:active, .cf-dk-icon:active, .cf-preset:active, .cf-btn:active { transform: scale(.97); }
+/* table: row hover, readable header, sorted column in the accent */
+.cf-table tbody tr td { transition: background-color .12s; }
+.cf-table tbody tr:hover td { background: #13213a; }
+.cf-table th { color: var(--mute) !important; }
+.cf-th.cf-sorted { color: var(--gold) !important; }
+/* states */
+.cf-state:empty { display: none; }
+.cf-state { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 12px 16px; border-radius: var(--cds-radius); border: 1px solid var(--line); background: var(--panel); color: var(--mute); }
+.cf-state[data-kind="error"] { border-color: var(--color-bad); color: var(--ink); }
+.cf-empty { text-align: center !important; padding: 36px 12px !important; white-space: normal !important; }
+.cf-empty p { margin: 0 0 12px; color: var(--mute); font-size: 14px; }
+.cf-chart-empty { display: grid; place-items: center; min-height: 280px; margin: 0; color: var(--mute); }
+.cf-mark { background: var(--gold) !important; border-radius: 6px !important; }
+.cf-table th { font-size: 11.5px !important; letter-spacing: .05em; }
+.cf-plat { font-size: 11px !important; }

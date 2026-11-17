@@ -186,7 +186,6 @@
   </aside>
 <div class="cf" data-source="campaigns">
   <header class="cf-head cf-hero" id="top">
-    <p class="cf-eyebrow">Content Rewards · refreshed every 4 hours</p>
     <h1>Campaign Finder</h1>
     <p class="cf-take" data-read lang="en"><b data-draw="t-count">—</b> campaigns match your filters, with <b data-draw="t-left">—</b> still unspent. Most budget per creator: <b data-draw="t-best">—</b>.</p>
     <p class="cf-hint" data-draw="t-updated">—</p>
@@ -195,6 +194,7 @@
 
 
 
+  <div class="cf-state" data-draw="state" role="status" aria-live="polite"></div>
   <section class="cf-picks" id="picks">
     <div class="cf-sechead"><h2>Best picks right now</h2><p class="cf-hint">Most budget per creator among campaigns already paying out, with 3+ creators, under your filters.</p></div>
     <div class="cf-pickgrid" data-draw="picks" data-source="campaigns"></div>
@@ -202,11 +202,11 @@
 
 
 
-  <section class="cf-kpis" id="kpis" aria-label="Summary">
-    <div class="cf-panel cf-kpi"><div class="cf-k">Matching campaigns</div><div class="cf-v" data-draw="k-count">—</div><div class="cf-s" data-draw="k-count-s">—</div></div>
-    <div class="cf-panel cf-kpi"><div class="cf-k">Budget still unspent</div><div class="cf-v" data-draw="k-left">—</div><div class="cf-s" data-draw="k-left-s">—</div></div>
-    <div class="cf-panel cf-kpi"><div class="cf-k">Median pay per 1K views</div><div class="cf-v" data-draw="k-rate">—</div><div class="cf-s">best platform rate per campaign</div></div>
-    <div class="cf-panel cf-kpi"><div class="cf-k">Median creators</div><div class="cf-v" data-draw="k-cr">—</div><div class="cf-s">competing in each campaign</div></div>
+  <section class="cf-kpis cf-strip" id="kpis" aria-label="Summary">
+    <div class="cf-kpi"><div class="cf-k">Matching campaigns</div><div class="cf-v" data-draw="k-count">—</div><div class="cf-s" data-draw="k-count-s">—</div></div>
+    <div class="cf-kpi"><div class="cf-k">Budget still unspent</div><div class="cf-v" data-draw="k-left">—</div><div class="cf-s" data-draw="k-left-s">—</div></div>
+    <div class="cf-kpi"><div class="cf-k">Median pay per 1K views</div><div class="cf-v" data-draw="k-rate">—</div><div class="cf-s">best platform rate per campaign</div></div>
+    <div class="cf-kpi"><div class="cf-k">Median creators</div><div class="cf-v" data-draw="k-cr">—</div><div class="cf-s">competing in each campaign</div></div>
   </section>
 
   <section class="cf-charts">
@@ -266,7 +266,7 @@
     hideGamb: true, hideNonEn: true, hideFace: true, paying: false, podcast: false, cpm: false,
     brush: null, sort: 'left_per_creator', limit: 100,
   };
-  window.CF_redraw = (except) => ['b-search', 'b-cat', 'b-budget', 'b-more', 'b-count', 'cat-list', 'picks', 'side-updated', 't-updated', 't-count', 't-left', 't-best', 'k-count', 'k-count-s', 'k-left', 'k-left-s', 'k-rate', 'k-cr', 'scatter', 'bars', 'rows', 'shown']
+  window.CF_redraw = (except) => ['state', 'b-search', 'b-cat', 'b-budget', 'b-more', 'b-count', 'cat-list', 'picks', 'side-updated', 't-updated', 't-count', 't-left', 't-best', 'k-count', 'k-count-s', 'k-left', 'k-left-s', 'k-rate', 'k-cr', 'scatter', 'bars', 'rows', 'shown']
     .filter((n) => n !== except).forEach((n) => dash.draw(n));
   window.CF_rows = () => { const d = dash.data('campaigns'); return d.status === 'ok' ? d.data : null; };
   // skip: 'cat' (bars), 'brush' (scatter) for cross-filtering
@@ -424,14 +424,27 @@
     document.querySelectorAll('.cf-th[data-sort]').forEach((th) => th.classList.toggle('cf-sorted', th.dataset.sort === window.CF.sort));
   });
 
+  // ---------- loading / error state ----------
+  dash.draw('state', (el) => {
+    el.replaceChildren(); const d = dash.data('campaigns');
+    el.dataset.kind = d.status;
+    if (d.status === 'loading') { el.textContent = 'Loading campaigns…'; return; }
+    if (d.status === 'error') {
+      const p = document.createElement('span'); p.textContent = 'Could not load the campaign data. Check your connection, then try again.';
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'cf-btn'; b.textContent = 'Try again'; b.onclick = () => location.reload();
+      el.append(p, b);
+    }
+  });
+
   // ---------- top picks ----------
   dash.draw('picks', (el) => {
     el.replaceChildren();
     const v = view(); if (!v) { el.textContent = '—'; return; }
     const top = v.filter((r) => r.paid > 0 && r.creators >= 3).sort((a, b) => b.left_per_creator - a.left_per_creator).slice(0, 3);
     if (!top.length) { const p = document.createElement('p'); p.className = 'cf-hint'; p.textContent = 'No paying campaign matches these filters.'; el.append(p); return; }
+    const first = !window.__picksShown; window.__picksShown = true;
     top.forEach((r, i) => {
-      const a = document.createElement('a'); a.className = 'cf-pick'; a.href = r.url; a.target = '_blank'; a.rel = 'noopener';
+      const a = document.createElement('a'); a.className = 'cf-pick' + (first ? ' cf-enter' : ''); a.style.setProperty('--i', i); a.href = r.url; a.target = '_blank'; a.rel = 'noopener';
       const rank = document.createElement('span'); rank.className = 'cf-pick-rank'; rank.textContent = '#' + (i + 1);
       const t = document.createElement('span'); t.className = 'cf-pick-title'; t.textContent = r.campaign;
       const o = document.createElement('span'); o.className = 'cf-pick-org'; o.textContent = `${r.org} · ${r.category}`;
@@ -472,6 +485,13 @@
   dash.draw('rows', (tb) => {
     const v = view(); tb.replaceChildren();
     if (!v) return;
+    if (!v.length) {
+      const tr = document.createElement('tr'); const td = document.createElement('td'); td.colSpan = 13; td.className = 'cf-empty';
+      const p = document.createElement('p'); p.textContent = 'No campaigns match these filters.';
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'cf-btn'; b.textContent = 'Clear filters';
+      b.onclick = () => { const r = document.getElementById('f-reset'); if (r) r.click(); };
+      td.append(p, b); tr.append(td); tb.append(tr); return;
+    }
     const pill = (txt, cls) => { const s = document.createElement('span'); s.className = 'cf-pill' + (cls ? ' ' + cls : ''); s.textContent = txt; return s; };
     for (const r of window.CF_sorted(v).slice(0, window.CF.limit)) {
       const tr = document.createElement('tr'); tr.dataset.key = r.id;
@@ -511,6 +531,7 @@
     el.replaceChildren();
     const rows = window.CF_rows(); if (!rows) { el.textContent = '—'; return; }
     const pts = window.CF_filter(rows, 'brush');
+    if (!pts.length) { const p = document.createElement('p'); p.className = 'cf-chart-empty'; p.textContent = 'No campaigns to plot with these filters.'; el.append(p); return; }
     const W = Math.max(280, el.clientWidth), H = 320, m = { t: 10, r: 14, b: 38, l: 58 };
     const x = d3.scaleLog().domain([1, Math.max(10, d3.max(pts, (r) => r.creators + 1) || 10)]).range([m.l, W - m.r]).nice();
     const y = d3.scaleLog().domain([Math.max(100, d3.min(pts, (r) => r.left + 1) || 100), Math.max(1000, d3.max(pts, (r) => r.left + 1) || 1000)]).range([H - m.b, m.t]).nice();
@@ -558,6 +579,7 @@
     el.replaceChildren();
     const rows = window.CF_rows(); if (!rows) { el.textContent = '—'; return; }
     const v = window.CF_filter(rows, 'cat');
+    if (!v.length) { const p = document.createElement('p'); p.className = 'cf-chart-empty'; p.textContent = 'No campaigns to show with these filters.'; el.append(p); return; }
     const data = d3.rollups(v, (g) => ({ left: d3.sum(g, (r) => r.left), n: g.length }), (r) => r.category)
       .map(([cat, o]) => ({ cat, ...o })).sort((a, b) => b.left - a.left).slice(0, 12);
     const W = Math.max(280, el.clientWidth), bh = 22, gap = 6, H = Math.max(120, data.length * (bh + gap) + 10);
