@@ -3,8 +3,21 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Campaign Finder</title>
+<title>campaignfinder</title>
 <meta name="description" content="Find the best Content Rewards campaigns for your conditions. Refreshed every 4 hours.">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" href="favicon-32.png" type="image/png" sizes="32x32">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
+<meta name="apple-mobile-web-app-title" content="campaignfinder">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="campaignfinder">
+<meta property="og:title" content="campaignfinder">
+<meta property="og:description" content="The best Content Rewards campaigns for your conditions, refreshed every 4 hours.">
+<meta property="og:image" content="https://campaignfinder.vercel.app/og.png">
+<meta property="og:url" content="https://campaignfinder.vercel.app/">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://campaignfinder.vercel.app/og.png">
 <script>
   (function () {
     var t = null; try { t = localStorage.getItem('cf-theme'); } catch (e) {}
@@ -14,7 +27,7 @@
 </script>
 <meta name="theme-color" content="#fafafa">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap">
 <style>
   :root {
     color-scheme: light;
@@ -26,7 +39,7 @@
     --shadow: 0 1px 2px rgba(9, 9, 11, .04);
     --shadow-pop: 0 12px 32px rgba(9, 9, 11, .12), 0 2px 6px rgba(9, 9, 11, .06);
     --font: 'Geist', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
-    --mono: 'Geist Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+    --mono: 'Geist', ui-sans-serif, system-ui, sans-serif; /* numbers: Geist with tabular figures */
     --r: 10px; --r-sm: 8px; --ease: cubic-bezier(.22, 1, .36, 1);
   }
   :root[data-theme="dark"] {
@@ -122,7 +135,7 @@
   .stat { padding: 14px 18px; min-width: 0; }
   .stat + .stat { border-left: 1px solid var(--line); }
   .stat span { display: block; color: var(--text-2); font-size: 12.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .stat b { display: block; margin-top: 4px; font-family: var(--mono); font-size: 22px; font-weight: 500; letter-spacing: -.02em; white-space: nowrap; }
+  .stat b { display: block; margin-top: 4px; font-family: var(--font); font-size: 22px; font-weight: 600; letter-spacing: -.02em; white-space: nowrap; }
   .stat b.g { color: var(--money); }
 
   .toolbar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 12px; border-bottom: 1px solid var(--line); }
@@ -178,7 +191,10 @@
   tbody tr { transition: background-color 120ms var(--ease); }
   tbody tr:hover { background: var(--hover); }
   td.rank { width: 1%; color: var(--text-3); font-family: var(--mono); font-size: 12.5px; text-align: left; padding-right: 4px; }
-  td.n { font-family: var(--mono); font-variant-numeric: tabular-nums; font-size: 13px; letter-spacing: -.01em; }
+  td.n { font-family: var(--font); font-variant-numeric: tabular-nums; font-feature-settings: 'tnum' 1; font-size: 13.5px; font-weight: 500; letter-spacing: 0; }
+  td .sub { display: block; font-size: 11.5px; font-weight: 400; color: var(--text-3); margin-top: 1px; }
+  td .sub.m-only { display: none; }
+  .stat b, em, .pages button, .dd-opt em.n, td.rank { font-variant-numeric: tabular-nums; font-feature-settings: 'tnum' 1; }
   td.name { white-space: normal; min-width: 220px; max-width: 340px; text-align: left; }
   .cname { display: inline-flex; align-items: center; gap: 6px; font-weight: 500; text-decoration: none; color: var(--text); }
   .cname:hover { text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--line-2); }
@@ -308,9 +324,10 @@
     td.name .m-plats { display: inline-flex; gap: 6px; margin-top: 4px; color: var(--text-3); }
     td.name .m-plats svg { width: 12px; height: 12px; fill: currentColor; }
     td.name .badge { margin-left: 4px; font-size: 10px; line-height: 16px; }
-    td.pays, th[data-k="platforms"], td.hide-m, th[data-k="max_payout"], th[data-k="age_days"] { display: none !important; }
+    td.pays, th[data-k="platforms"], td.hide-m, th[data-k="paid"], th[data-k="age_days"] { display: none !important; }
+    td .sub.m-only { display: block; }
     th[data-k="rate"], td[data-l="Pay / 1K"] { width: 58px; }
-    th[data-k="left"], td[data-l="Money left"] { width: 76px; }
+    th[data-k="budget"], td[data-l="Total budget"] { width: 84px; }
     th[data-k="creators"], td[data-l="Creators"] { width: 46px; }
     td.n { font-size: 12.5px; }
     td[data-l]::before { content: none !important; }
@@ -346,7 +363,7 @@
 <div class="app">
   <aside class="side" id="side" aria-label="Filters">
     <div class="side-head">
-      <span class="mark" aria-hidden="true"><svg class="ico"><use href="#i-target"/></svg></span><b>Campaign Finder</b>
+      <span class="mark" aria-hidden="true"><svg class="ico"><use href="#i-target"/></svg></span><b>campaignfinder</b>
       <button class="iconbtn side-close" id="side-close" type="button" aria-label="Close filters"><svg class="ico"><use href="#i-x"/></svg></button>
     </div>
     <div class="side-title"><span><svg class="ico"><use href="#i-filter"/></svg>Filters <em id="side-n"></em></span></div>
@@ -417,9 +434,9 @@
     maxCr: { label: 'Creators', opts: [null, 10, 25, 50, 100], fmt: (v) => `${v} or fewer`, test: (r, v) => r.creators <= v },
     minRate: { label: 'Pay per 1K', opts: [null, 1, 1.5, 2, 3], fmt: (v) => rateF.format(v) + '+', test: (r, v) => r.rate >= v && !r.per_post },
   };
-  const COLS = [['rank', '#', 'l'], ['campaign', 'Campaign', 'l'], ['platforms', 'Pays on', 'l'], ['rate', 'Pay / 1K'], ['left', 'Money left'],
-    ['creators', 'Creators'], ['max_payout', 'Max / clip'], ['age_days', 'Age']];
-  const SORTS = [['left_per_creator:desc', 'Best value'], ['left:desc', 'Most money left'], ['creators:asc', 'Fewest creators'], ['rate:desc', 'Highest pay per 1K'],
+  const COLS = [['rank', '#', 'l'], ['campaign', 'Campaign', 'l'], ['platforms', 'Pays on', 'l'], ['rate', 'Pay / 1K'], ['budget', 'Total budget'],
+    ['paid', 'Paid out'], ['creators', 'Creators'], ['age_days', 'Age']];
+  const SORTS = [['left_per_creator:desc', 'Best value'], ['left:desc', 'Most money left'], ['budget:desc', 'Biggest budget'], ['paid:desc', 'Paid out most'], ['creators:asc', 'Fewest creators'], ['rate:desc', 'Highest pay per 1K'],
     ['max_payout:desc', 'Highest max per clip'], ['age_days:asc', 'Newest'], ['spent_per_day:desc', 'Paying out fastest']];
   const DEF = { q: '', types: [], plats: [], cats: [], minLeft: 1500, maxCr: null, minRate: null, sort: [['left_per_creator', 'desc']], page: 1, size: 25,
     hideZero: true, hideGamb: true, hideNonEn: true, hideFace: true, paying: false, isNew: false, podcast: false, cpm: false };
@@ -637,9 +654,10 @@
       const n = (k, text, label, extra) => el('td', { class: ['n', k === key ? 'hl' : '', extra || ''].join(' ').trim(), 'data-l': label, text });
       tb.append(el('tr', {}, el('td', { class: 'rank', text: String(start + i + 1) }), name,
         el('td', { class: 'l pays', 'data-l': 'Pays on' }, r.platforms ? pl : el('span', { class: 'muted', text: '—' })),
-        n('rate', r.per_post ? 'Per post' : rateF.format(r.rate), 'Pay / 1K'), n('left', money.format(r.left), 'Money left'),
-        n('creators', intF.format(r.creators), 'Creators'),
-        n('max_payout', r.max_payout != null ? money.format(r.max_payout) : '—', 'Max / clip', 'hide-m'), n('age_days', ageText(r), 'Age', 'hide-m')));
+        n('rate', r.per_post ? 'Per post' : rateF.format(r.rate), 'Pay / 1K'),
+        (() => { const c = n('budget', money.format(r.budget), 'Total budget'); c.append(el('span', { class: 'sub m-only', text: `${money.format(r.paid)} paid` })); return c; })(),
+        (() => { const c = n('paid', money.format(r.paid), 'Paid out', 'hide-m'); const pct = r.budget ? Math.round(100 * r.paid / r.budget) : 0; c.append(el('span', { class: 'sub', text: `${pct}% of budget` })); return c; })(),
+        n('creators', intF.format(r.creators), 'Creators'), n('age_days', ageText(r), 'Age', 'hide-m')));
     });
     $('range').textContent = list.length ? `Results ${intF.format(start + 1)}–${intF.format(start + view.length)} of ${intF.format(list.length)}` : 'No results';
     $('pg-note').textContent = pages > 1 ? `Page ${S.page} of ${pages}` : '';
