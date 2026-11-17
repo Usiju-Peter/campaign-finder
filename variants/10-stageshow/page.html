@@ -186,10 +186,30 @@
   </aside>
 <div class="cf" data-source="campaigns">
   <header class="cf-head cf-hero" id="top">
-    <p class="cf-eyebrow">Content Rewards · refreshed every 4 hours</p>
+    <p class="cf-eyebrow">How to find a campaign worth clipping, in four clicks</p>
     <h1>Campaign Finder</h1>
     <p class="cf-take" data-read lang="en"><b data-draw="t-count">—</b> campaigns match your filters, with <b data-draw="t-left">—</b> still unspent. Most budget per creator: <b data-draw="t-best">—</b>.</p>
     <p class="cf-hint" data-draw="t-updated">—</p>
+    <figure class="ss-stage" id="demo" aria-label="Demo: filter to campaigns with 5,000 dollars or more left, sort by fewest creators, and the best pick rises to the top">
+      <div class="ss-win">
+        <div class="ss-bar">
+          <span class="ss-chip" data-t="budget">Budget<em class="ss-badge">1</em></span>
+          <span class="ss-chip" data-t="sort">Sort</span>
+          <span class="ss-chip ss-chip-q" data-t="clear">Clear</span>
+          <i class="ss-fill" style="--w:46px"></i>
+          <div class="ss-menu" data-m="budget"><span class="ss-opt" data-t="5k">$5K+</span><i class="ss-fill" style="--w:34px"></i><i class="ss-fill" style="--w:40px"></i></div>
+          <div class="ss-menu" data-m="sort"><i class="ss-fill" style="--w:96px"></i><span class="ss-opt" data-t="fewest">Fewest creators</span><i class="ss-fill" style="--w:72px"></i></div>
+        </div>
+        <div class="ss-list">
+          <div class="ss-row" data-k="a"><span class="ss-name">Social Media Justice</span><span class="ss-cr">8 creators</span><span class="ss-amt">$19.8K</span></div>
+          <div class="ss-row" data-k="b"><i class="ss-fill" style="--w:150px"></i><span class="ss-cr ss-dim">34</span><span class="ss-amt ss-dim">$15.9K</span></div>
+          <div class="ss-row" data-k="c"><i class="ss-fill" style="--w:120px"></i><span class="ss-cr ss-dim">18</span><span class="ss-amt ss-dim">$7.5K</span></div>
+          <div class="ss-row" data-k="d"><i class="ss-fill" style="--w:136px"></i><span class="ss-cr ss-dim">10</span><span class="ss-amt ss-dim">$2.1K</span></div>
+        </div>
+      </div>
+      <svg class="ss-cursor" width="22" height="26" viewBox="0 0 17 20" aria-hidden="true"><path d="M1 1 L1 16 L5 12.5 L8 19 L10.5 18 L7.6 11.6 L13 11.6 Z" fill="#0a1220" stroke="#fff" stroke-width="1.3" stroke-linejoin="round"/></svg>
+      <span class="ss-ripple" aria-hidden="true"></span>
+    </figure>
   </header>
 
 
@@ -578,4 +598,53 @@
     g.append('text').attr('x', (d) => lw + Math.max(2, x(d.left)) + 6).attr('y', bh / 2).attr('dy', '0.35em').text((d) => `${F.k(d.left)} · ${d.n}`);
     g.append('title').text((d) => `${d.cat}: ${F.money(d.left)} left across ${d.n} campaigns`);
   });
+</script>
+
+<script>
+/* Stageshow-style walkthrough: authored, not automation. Every move has a cause; poster = the payoff. */
+(() => {
+  const st = document.getElementById('demo'); if (!st) return;
+  const q = (sel) => st.querySelector(sel), qa = (sel) => [...st.querySelectorAll(sel)];
+  const cur = q('.ss-cursor'), rip = q('.ss-ripple'), rows = qa('.ss-row');
+  const H = () => (rows[0] ? rows[0].offsetHeight + 6 : 46);
+  const order = { initial: ['b', 'a', 'c', 'd'], filtered: ['b', 'a', 'c'], sorted: ['a', 'c', 'b'] };
+  const place = (keys) => rows.forEach((r) => { const i = keys.indexOf(r.dataset.k); r.classList.toggle('ss-out', i < 0); if (i >= 0) r.style.transform = `translateY(${i * H()}px)`; });
+  const rect = (t) => { const a = st.getBoundingClientRect(), b = q(`[data-t="${t}"]`).getBoundingClientRect(); return [b.left - a.left + Math.min(b.width * 0.5, 40), b.top - a.top + b.height * 0.6]; };
+  const rest = (fx, fy) => { cur.style.transform = `translate(${st.clientWidth * fx}px, ${st.clientHeight * fy}px)`; };
+  const move = (t) => { const [x, y] = rect(t); cur.style.transform = `translate(${x}px, ${y}px)`; };
+  const click = (t) => { const [x, y] = rect(t); rip.style.left = x + 'px'; rip.style.top = y + 'px'; rip.classList.remove('ss-go'); void rip.offsetWidth; rip.classList.add('ss-go');
+    const el = q(`[data-t="${t}"]`); el.classList.add('ss-press'); setTimeout(() => el.classList.remove('ss-press'), 140); };
+  const menu = (m, on) => q(`[data-m="${m}"]`).classList.toggle('ss-open', on);
+  const set = (cls, on) => st.classList.toggle(cls, on);
+  const poster = () => { place(order.sorted); set('ss-filtered', true); set('ss-sorted', true); set('ss-won', true); rest(0.62, 0.86); };
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) { poster(); return; }
+  let timers = [];
+  const at = (ms, fn) => timers.push(setTimeout(fn, ms));
+  const run = () => {
+    timers.forEach(clearTimeout); timers = [];
+    st.classList.remove('ss-filtered', 'ss-sorted', 'ss-won'); menu('budget', false); menu('sort', false); place(order.initial);
+    rest(0.8, 0.9);
+    at(500, () => move('budget'));
+    at(1300, () => { click('budget'); menu('budget', true); });
+    at(2000, () => move('5k'));
+    at(2700, () => { click('5k'); set('ss-filtered', true); });
+    at(3100, () => { menu('budget', false); place(order.filtered); });
+    at(4200, () => move('sort'));
+    at(5000, () => { click('sort'); menu('sort', true); });
+    at(5700, () => move('fewest'));
+    at(6400, () => { click('fewest'); set('ss-sorted', true); });
+    at(6800, () => { menu('sort', false); place(order.sorted); });
+    at(7600, () => set('ss-won', true));
+    at(8200, () => { rest(0.62, 0.86); });
+    at(11400, () => move('clear'));
+    at(12200, () => click('clear'));
+    at(12500, () => { set('ss-won', false); set('ss-sorted', false); set('ss-filtered', false); place(order.initial); });
+    at(13400, run);
+  };
+  // run only while visible; the poster is the resting frame
+  poster();
+  const io = new IntersectionObserver((e) => { if (e[0].isIntersecting) { if (!timers.length) run(); } else { timers.forEach(clearTimeout); timers = []; poster(); } }, { threshold: 0.4 });
+  io.observe(st);
+  window.addEventListener('resize', () => { if (st.classList.contains('ss-sorted')) place(order.sorted); });
+})();
 </script>

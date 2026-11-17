@@ -1,5 +1,5 @@
 name=Stageshow
 fonts=Manrope:wght@400;600;800&family=IBM+Plex+Mono:wght@500;600
 colors=["#f2b84b", "#4cc9f0", "#b388ff", "#3ecf8e"]
-status=pending
-note=
+status=done
+note=Product-demo pass: an animated walkthrough beside the headline. A cursor filters to $5K+, sorts by fewest creators and the best pick rises, with a visible reset; the resting frame shows the result.

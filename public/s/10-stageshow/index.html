@@ -27,6 +27,59 @@ body { margin: 0; background: var(--color-bg); color: var(--color-fg); font: 14p
 .cf-table td:first-child { font-family: Manrope, sans-serif; font-size: 13px; }
 .cf-chip:has(input:checked) { border-color: #f2b84b; color: #f2b84b; }
 .cf-plat-tiktok, .cf-plat-x { background: #2b3a55; }
+
+/* ===== Stageshow pass: a miniature of the product, one story, a payoff that holds ===== */
+:root { --gold:#f2b84b; --ss-ease: cubic-bezier(.22,1,.36,1); }
+.cf-hero { display: grid !important; grid-template-columns: minmax(0, 1fr) minmax(0, 520px); column-gap: 32px; align-items: center; overflow: hidden; }
+.cf-hero > :not(.ss-stage) { grid-column: 1; }
+.ss-stage { grid-column: 2; grid-row: 1 / span 5; position: relative; margin: -30px -28px -26px 0; height: calc(100% + 56px); min-height: 300px; align-self: stretch; }
+.cf-hero { background: radial-gradient(700px 260px at 85% 40%, rgba(242,184,75,.10), transparent 70%), #0e1a2e !important; }
+/* the window runs off the right and bottom edges: a crop, not a pasted screenshot */
+.ss-win { position: absolute; left: 0; top: 34px; right: -40px; bottom: -40px; background: #0b1424; border: 1px solid #22324f; border-radius: 14px 0 0 0;
+  box-shadow: -18px 24px 50px rgba(0,0,0,.45); overflow: hidden; }
+.ss-bar { position: relative; display: flex; align-items: center; gap: 8px; padding: 12px 14px; border-bottom: 1px solid #1c2a44; }
+.ss-chip { display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 12px; border-radius: 999px; background: #152239; color: #c9d4e6; font-size: 13px; font-weight: 600;
+  transition: transform 120ms var(--ss-ease), background-color 200ms var(--ss-ease), color 200ms var(--ss-ease); }
+.ss-chip-q { background: none; color: #8a9bb4; font-weight: 500; }
+.ss-chip.ss-press, .ss-opt.ss-press { transform: scale(.94); }
+.ss-badge { font-style: normal; min-width: 16px; height: 16px; border-radius: 99px; background: var(--gold); color: #0a1220; font-size: 10.5px; display: inline-grid; place-items: center;
+  opacity: 0; transform: scale(.4); transition: opacity 200ms var(--ss-ease), transform 260ms var(--ss-ease); }
+.ss-filtered .ss-badge { opacity: 1; transform: none; }
+.ss-fill { display: inline-block; width: var(--w); height: 8px; border-radius: 99px; background: #1d2b45; }
+.ss-bar > .ss-fill { margin-left: auto; }
+.ss-menu { position: absolute; top: 46px; z-index: 3; display: grid; gap: 8px; padding: 10px; min-width: 170px; background: #13203a; border: 1px solid #2a3a56; border-radius: 12px;
+  box-shadow: 0 14px 30px rgba(0,0,0,.45); opacity: 0; transform: translateY(-6px) scale(.97); transform-origin: top left; pointer-events: none;
+  transition: opacity 160ms var(--ss-ease), transform 220ms var(--ss-ease); }
+.ss-menu[data-m="budget"] { left: 14px; } .ss-menu[data-m="sort"] { left: 102px; }
+.ss-menu.ss-open { opacity: 1; transform: none; }
+.ss-opt { display: inline-flex; align-items: center; height: 28px; padding: 0 10px; border-radius: 8px; background: #1a2944; color: #e8eef7; font-size: 13px; font-weight: 600; width: max-content;
+  transition: transform 120ms var(--ss-ease), background-color 200ms, color 200ms; }
+.ss-filtered [data-t="5k"], .ss-sorted [data-t="fewest"] { background: var(--gold); color: #0a1220; }
+.ss-list { position: relative; margin: 14px 58px 14px 14px; height: 200px; }
+.ss-row { position: absolute; left: 0; right: 0; top: 0; height: 40px; display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; gap: 16px; padding: 0 14px;
+  border-radius: 10px; background: #101c31; box-shadow: inset 0 0 0 1px transparent;
+  transition: transform 520ms var(--ss-ease), opacity 260ms var(--ss-ease), box-shadow 320ms var(--ss-ease), background-color 320ms var(--ss-ease); }
+.ss-row.ss-out { opacity: 0; transform: translateY(140px) !important; }
+.ss-name { color: #e8eef7; font-weight: 700; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ss-cr { color: #8a9bb4; font-size: 12.5px; font-variant-numeric: tabular-nums; }
+.ss-amt { color: #e8eef7; font-weight: 700; font-size: 14px; font-variant-numeric: tabular-nums; min-width: 56px; text-align: right; }
+.ss-dim { color: #5d6e8a !important; font-weight: 500; }
+.ss-won .ss-row[data-k="a"] { background: #1b2740; box-shadow: inset 0 0 0 1.5px var(--gold); }
+.ss-won .ss-row[data-k="a"] .ss-amt { color: var(--gold); }
+.ss-cursor { position: absolute; left: 0; top: 0; z-index: 5; margin: -2px 0 0 -3px; filter: drop-shadow(0 2px 3px rgba(0,0,0,.4));
+  transition: transform 640ms cubic-bezier(.65,0,.35,1); will-change: transform; }
+.ss-ripple { position: absolute; z-index: 4; width: 34px; height: 34px; margin: -17px 0 0 -17px; border-radius: 50%; border: 2px solid var(--gold); opacity: 0; pointer-events: none; }
+.ss-ripple.ss-go { animation: ss-rip 420ms var(--ss-ease); }
+@keyframes ss-rip { from { opacity: .9; transform: scale(.35); } to { opacity: 0; transform: scale(1.15); } }
+/* compact: the phone column gets its own arrangement, not a squeeze */
+@media (max-width: 1100px) {
+  .cf-hero { grid-template-columns: minmax(0, 1fr); }
+  .ss-stage { grid-column: 1; grid-row: auto; margin: 18px -28px -26px -28px; height: 300px; }
+  .ss-win { left: 20px; border-radius: 14px 0 0 0; }
+}
+@media (max-width: 480px) { .ss-stage { height: 280px; } .ss-row { gap: 10px; padding: 0 10px; } .ss-name { font-size: 13px; } .ss-chip-q { display: none; } }
+@media (prefers-reduced-motion: reduce) { .ss-row, .ss-cursor, .ss-menu, .ss-badge { transition: none !important; } }
+.cf-mark { background: var(--gold) !important; border-radius: 6px !important; }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
 <script>window.__COLORS = ["#f2b84b", "#4cc9f0", "#b388ff", "#3ecf8e"]; window.__DATA_URL = '../../data/campaigns.json';</script>
@@ -242,10 +295,30 @@ window.dash = (() => {
   </aside>
 <div class="cf" data-source="campaigns">
   <header class="cf-head cf-hero" id="top">
-    <p class="cf-eyebrow">Content Rewards · refreshed every 4 hours</p>
+    <p class="cf-eyebrow">How to find a campaign worth clipping, in four clicks</p>
     <h1>Campaign Finder</h1>
     <p class="cf-take" data-read lang="en"><b data-draw="t-count">—</b> campaigns match your filters, with <b data-draw="t-left">—</b> still unspent. Most budget per creator: <b data-draw="t-best">—</b>.</p>
     <p class="cf-hint" data-draw="t-updated">—</p>
+    <figure class="ss-stage" id="demo" aria-label="Demo: filter to campaigns with 5,000 dollars or more left, sort by fewest creators, and the best pick rises to the top">
+      <div class="ss-win">
+        <div class="ss-bar">
+          <span class="ss-chip" data-t="budget">Budget<em class="ss-badge">1</em></span>
+          <span class="ss-chip" data-t="sort">Sort</span>
+          <span class="ss-chip ss-chip-q" data-t="clear">Clear</span>
+          <i class="ss-fill" style="--w:46px"></i>
+          <div class="ss-menu" data-m="budget"><span class="ss-opt" data-t="5k">$5K+</span><i class="ss-fill" style="--w:34px"></i><i class="ss-fill" style="--w:40px"></i></div>
+          <div class="ss-menu" data-m="sort"><i class="ss-fill" style="--w:96px"></i><span class="ss-opt" data-t="fewest">Fewest creators</span><i class="ss-fill" style="--w:72px"></i></div>
+        </div>
+        <div class="ss-list">
+          <div class="ss-row" data-k="a"><span class="ss-name">Social Media Justice</span><span class="ss-cr">8 creators</span><span class="ss-amt">$19.8K</span></div>
+          <div class="ss-row" data-k="b"><i class="ss-fill" style="--w:150px"></i><span class="ss-cr ss-dim">34</span><span class="ss-amt ss-dim">$15.9K</span></div>
+          <div class="ss-row" data-k="c"><i class="ss-fill" style="--w:120px"></i><span class="ss-cr ss-dim">18</span><span class="ss-amt ss-dim">$7.5K</span></div>
+          <div class="ss-row" data-k="d"><i class="ss-fill" style="--w:136px"></i><span class="ss-cr ss-dim">10</span><span class="ss-amt ss-dim">$2.1K</span></div>
+        </div>
+      </div>
+      <svg class="ss-cursor" width="22" height="26" viewBox="0 0 17 20" aria-hidden="true"><path d="M1 1 L1 16 L5 12.5 L8 19 L10.5 18 L7.6 11.6 L13 11.6 Z" fill="#0a1220" stroke="#fff" stroke-width="1.3" stroke-linejoin="round"/></svg>
+      <span class="ss-ripple" aria-hidden="true"></span>
+    </figure>
   </header>
 
 
@@ -634,6 +707,55 @@ window.dash = (() => {
     g.append('text').attr('x', (d) => lw + Math.max(2, x(d.left)) + 6).attr('y', bh / 2).attr('dy', '0.35em').text((d) => `${F.k(d.left)} · ${d.n}`);
     g.append('title').text((d) => `${d.cat}: ${F.money(d.left)} left across ${d.n} campaigns`);
   });
+</script>
+
+<script>
+/* Stageshow-style walkthrough: authored, not automation. Every move has a cause; poster = the payoff. */
+(() => {
+  const st = document.getElementById('demo'); if (!st) return;
+  const q = (sel) => st.querySelector(sel), qa = (sel) => [...st.querySelectorAll(sel)];
+  const cur = q('.ss-cursor'), rip = q('.ss-ripple'), rows = qa('.ss-row');
+  const H = () => (rows[0] ? rows[0].offsetHeight + 6 : 46);
+  const order = { initial: ['b', 'a', 'c', 'd'], filtered: ['b', 'a', 'c'], sorted: ['a', 'c', 'b'] };
+  const place = (keys) => rows.forEach((r) => { const i = keys.indexOf(r.dataset.k); r.classList.toggle('ss-out', i < 0); if (i >= 0) r.style.transform = `translateY(${i * H()}px)`; });
+  const rect = (t) => { const a = st.getBoundingClientRect(), b = q(`[data-t="${t}"]`).getBoundingClientRect(); return [b.left - a.left + Math.min(b.width * 0.5, 40), b.top - a.top + b.height * 0.6]; };
+  const rest = (fx, fy) => { cur.style.transform = `translate(${st.clientWidth * fx}px, ${st.clientHeight * fy}px)`; };
+  const move = (t) => { const [x, y] = rect(t); cur.style.transform = `translate(${x}px, ${y}px)`; };
+  const click = (t) => { const [x, y] = rect(t); rip.style.left = x + 'px'; rip.style.top = y + 'px'; rip.classList.remove('ss-go'); void rip.offsetWidth; rip.classList.add('ss-go');
+    const el = q(`[data-t="${t}"]`); el.classList.add('ss-press'); setTimeout(() => el.classList.remove('ss-press'), 140); };
+  const menu = (m, on) => q(`[data-m="${m}"]`).classList.toggle('ss-open', on);
+  const set = (cls, on) => st.classList.toggle(cls, on);
+  const poster = () => { place(order.sorted); set('ss-filtered', true); set('ss-sorted', true); set('ss-won', true); rest(0.62, 0.86); };
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) { poster(); return; }
+  let timers = [];
+  const at = (ms, fn) => timers.push(setTimeout(fn, ms));
+  const run = () => {
+    timers.forEach(clearTimeout); timers = [];
+    st.classList.remove('ss-filtered', 'ss-sorted', 'ss-won'); menu('budget', false); menu('sort', false); place(order.initial);
+    rest(0.8, 0.9);
+    at(500, () => move('budget'));
+    at(1300, () => { click('budget'); menu('budget', true); });
+    at(2000, () => move('5k'));
+    at(2700, () => { click('5k'); set('ss-filtered', true); });
+    at(3100, () => { menu('budget', false); place(order.filtered); });
+    at(4200, () => move('sort'));
+    at(5000, () => { click('sort'); menu('sort', true); });
+    at(5700, () => move('fewest'));
+    at(6400, () => { click('fewest'); set('ss-sorted', true); });
+    at(6800, () => { menu('sort', false); place(order.sorted); });
+    at(7600, () => set('ss-won', true));
+    at(8200, () => { rest(0.62, 0.86); });
+    at(11400, () => move('clear'));
+    at(12200, () => click('clear'));
+    at(12500, () => { set('ss-won', false); set('ss-sorted', false); set('ss-filtered', false); place(order.initial); });
+    at(13400, run);
+  };
+  // run only while visible; the poster is the resting frame
+  poster();
+  const io = new IntersectionObserver((e) => { if (e[0].isIntersecting) { if (!timers.length) run(); } else { timers.forEach(clearTimeout); timers = []; poster(); } }, { threshold: 0.4 });
+  io.observe(st);
+  window.addEventListener('resize', () => { if (st.classList.contains('ss-sorted')) place(order.sorted); });
+})();
 </script>
 
 </div></body></html>
