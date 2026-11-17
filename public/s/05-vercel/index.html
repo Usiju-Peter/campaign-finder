@@ -27,7 +27,42 @@ body { margin: 0; background: var(--color-bg); color: var(--color-fg); font: 14p
 .cf-table td:first-child { font-family: Manrope, sans-serif; font-size: 13px; }
 .cf-chip:has(input:checked) { border-color: #f2b84b; color: #f2b84b; }
 .cf-plat-tiktok, .cf-plat-x { background: #2b3a55; }
+
+/* ===== Vercel guidelines pass ===== */
+html { color-scheme: dark; scroll-padding-top: 92px; -webkit-tap-highlight-color: rgba(242,184,75,.18); }
+@media (pointer: fine) { html { overscroll-behavior: none; } }
+button, a, input, label, .cf-th { touch-action: manipulation; }
+/* sticky bar never covers what has focus or what a link jumps to */
+#picks, #kpis, #map, #cats, #list, h2 { scroll-margin-top: 92px; }
+:focus-visible { outline: 2px solid #f2b84b !important; outline-offset: 2px; }
+.cf-tog:focus-within, .cf-chip:focus-within { outline: 2px solid #f2b84b; outline-offset: 1px; }
+/* headings without widows; long names wrap instead of overflowing */
+h1, h2, .cf-pick-title { text-wrap: balance; }
+.cf-take, .cf-hint, details p { text-wrap: pretty; }
+.cf-pick-title, .cf-table td:first-child a, .cf-org { overflow-wrap: anywhere; }
+.cf-pick, .cf-pick > * { min-width: 0; }
+/* big table: let the browser skip rendering rows off screen */
+.cf-table tbody tr { content-visibility: auto; contain-intrinsic-size: auto 56px; }
+/* menus that scroll keep the scroll inside */
+.cf-pop { overscroll-behavior: contain; }
+/* skip link */
+.cf-skip { position: absolute; left: 16px; top: -60px; z-index: 100; background: #f2b84b; color: #0a1220; padding: 10px 14px; border-radius: 10px; font-weight: 700; text-decoration: none; }
+.cf-skip:focus-visible { top: 12px; }
+/* undo toast */
+.cf-toast { position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); z-index: 80;
+  display: flex; align-items: center; gap: 12px; padding: 10px 10px 10px 16px; background: #15233a; color: #e8eef7; border: 1px solid #2a3a56;
+  border-radius: 12px; box-shadow: 0 12px 30px rgba(0,0,0,.45); }
+.cf-toast[hidden] { display: none !important; }
+/* hover and focus are more prominent than rest */
+.cf-dk-btn:hover, .cf-dk-btn:focus-visible { background: rgba(255,255,255,.12) !important; color: #fff !important; }
+.cf-th:hover { color: #e8eef7 !important; }
+.cf-th[aria-sort] { color: #f2b84b !important; }
+.cf-th[aria-sort="descending"]::after { content: " \2193"; } .cf-th[aria-sort="ascending"]::after { content: " \2191"; }
+.cf-mark { background: #f2b84b !important; border-radius: 6px !important; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition-duration: 0ms !important; animation: none !important; } }
 </style>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin><meta name="theme-color" content="#0a1220"><meta name="color-scheme" content="dark">
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
 <script>window.__COLORS = ["#f2b84b", "#4cc9f0", "#b388ff", "#3ecf8e"]; window.__DATA_URL = '../../data/campaigns.json';</script>
 <script>// Minimal stand-in for the dashboard runtime: loads the data file and reruns every drawing.
@@ -212,30 +247,32 @@ window.dash = (() => {
   }
 </style>
 
+  <a class="cf-skip" href="#list">Skip to Campaign List</a>
+  <div class="cf-toast" id="cf-toast" role="status" aria-live="polite" hidden><span>Filters cleared.</span> <button type="button" class="cf-btn" id="cf-undo">Undo</button></div>
   <div class="cf-dock" role="toolbar" aria-label="Filter and sort campaigns">
     <div class="cf-dk-seg" role="group" aria-label="Type">
       <button type="button" class="cf-seg" data-type="" aria-pressed="true">All</button><button type="button" class="cf-seg" data-type="Clipping" aria-pressed="false">Clipping</button><button type="button" class="cf-seg" data-type="UGC" aria-pressed="false">UGC</button><button type="button" class="cf-seg" data-type="Slideshow" aria-pressed="false">Slideshow</button>
     </div>
     <div class="cf-dk-item"><button type="button" class="cf-dk-btn" data-pop="pop-search" aria-expanded="false"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>Search<span class="cf-badge" data-draw="b-search"></span></button>
-      <div class="cf-pop" id="pop-search"><label class="cf-pop-label" for="f-q">Campaign, brand or category</label><input type="search" id="f-q" placeholder="e.g. podcast, Reach, faith" autocomplete="off"></div></div>
+      <div class="cf-pop" id="pop-search"><label class="cf-pop-label" for="f-q">Campaign, brand or category</label><input type="search" id="f-q" name="q" placeholder="e.g. podcast, Reach, faith…" autocomplete="off" spellcheck="false" enterkeyhint="search"></div></div>
     <div class="cf-dk-item"><button type="button" class="cf-dk-btn" data-pop="pop-sort" aria-expanded="false"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 7h16M7 12h10M10 17h4"/></svg>Sort</button>
       <div class="cf-pop" id="pop-sort"><p class="cf-pop-label">Sort by</p><div class="cf-opts"><button type="button" class="cf-opt" data-sort-opt="left_per_creator" aria-pressed="false">Most budget per creator</button><button type="button" class="cf-opt" data-sort-opt="left" aria-pressed="false">Most budget left</button><button type="button" class="cf-opt" data-sort-opt="creators_asc" aria-pressed="false">Fewest creators</button><button type="button" class="cf-opt" data-sort-opt="budget" aria-pressed="false">Biggest total budget</button><button type="button" class="cf-opt" data-sort-opt="rate" aria-pressed="false">Highest pay per 1K</button><button type="button" class="cf-opt" data-sort-opt="max_payout" aria-pressed="false">Highest max payout</button><button type="button" class="cf-opt" data-sort-opt="age_asc" aria-pressed="false">Newest</button><button type="button" class="cf-opt" data-sort-opt="spent_per_day" aria-pressed="false">Fastest spending</button></div></div></div>
     <div class="cf-dk-item"><button type="button" class="cf-dk-btn" data-pop="pop-cat" aria-expanded="false"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" stroke="none" stroke-width="2" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg>Category<span class="cf-badge" data-draw="b-cat"></span></button>
-      <div class="cf-pop cf-pop-wide" id="pop-cat"><div class="cf-pop-head"><p class="cf-pop-label">Categories (pick any)</p><button type="button" class="cf-link" id="cat-clear">Clear</button></div><div class="cf-catlist" data-draw="cat-list"></div></div></div>
+      <div class="cf-pop cf-pop-wide" id="pop-cat"><div class="cf-pop-head"><p class="cf-pop-label">Categories (pick any)</p><button type="button" class="cf-link" id="cat-clear">Clear Categories</button></div><div class="cf-catlist" data-draw="cat-list"></div></div></div>
     <div class="cf-dk-item"><button type="button" class="cf-dk-btn" data-pop="pop-budget" aria-expanded="false"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M14.8 9.2c-.5-.9-1.6-1.4-2.8-1.4-1.6 0-2.8.8-2.8 2s1.2 1.7 2.8 2 2.8.8 2.8 2-1.2 2-2.8 2c-1.3 0-2.4-.5-2.9-1.5M12 6v1.8M12 16.2V18"/></svg>Budget<span class="cf-badge" data-draw="b-budget"></span></button>
       <div class="cf-pop cf-pop-wide" id="pop-budget"><div class="cf-pop-group"><p class="cf-pop-label">Budget left</p><div class="cf-presets"><button type="button" class="cf-preset" data-k="minLeft" data-v="" aria-pressed="false">Any</button><button type="button" class="cf-preset" data-k="minLeft" data-v="1500" aria-pressed="false">$1.5K+</button><button type="button" class="cf-preset" data-k="minLeft" data-v="5000" aria-pressed="false">$5K+</button><button type="button" class="cf-preset" data-k="minLeft" data-v="10000" aria-pressed="false">$10K+</button><button type="button" class="cf-preset" data-k="minLeft" data-v="25000" aria-pressed="false">$25K+</button></div></div><div class="cf-pop-group"><p class="cf-pop-label">Creators competing</p><div class="cf-presets"><button type="button" class="cf-preset" data-k="maxCr" data-v="" aria-pressed="false">Any</button><button type="button" class="cf-preset" data-k="maxCr" data-v="10" aria-pressed="false">10 or fewer</button><button type="button" class="cf-preset" data-k="maxCr" data-v="25" aria-pressed="false">25 or fewer</button><button type="button" class="cf-preset" data-k="maxCr" data-v="50" aria-pressed="false">50 or fewer</button><button type="button" class="cf-preset" data-k="maxCr" data-v="100" aria-pressed="false">100 or fewer</button></div></div><div class="cf-pop-group"><p class="cf-pop-label">Pay per 1K views</p><div class="cf-presets"><button type="button" class="cf-preset" data-k="minRate" data-v="" aria-pressed="false">Any</button><button type="button" class="cf-preset" data-k="minRate" data-v="1" aria-pressed="false">$1+</button><button type="button" class="cf-preset" data-k="minRate" data-v="1.5" aria-pressed="false">$1.50+</button><button type="button" class="cf-preset" data-k="minRate" data-v="2" aria-pressed="false">$2+</button><button type="button" class="cf-preset" data-k="minRate" data-v="3" aria-pressed="false">$3+</button></div></div><div class="cf-pop-group"><p class="cf-pop-label">Launched</p><div class="cf-presets"><button type="button" class="cf-preset" data-k="maxAge" data-v="" aria-pressed="false">Any time</button><button type="button" class="cf-preset" data-k="maxAge" data-v="7" aria-pressed="false">This week</button><button type="button" class="cf-preset" data-k="maxAge" data-v="30" aria-pressed="false">This month</button></div></div></div></div>
     <div class="cf-dk-item"><button type="button" class="cf-dk-btn" data-pop="pop-more" aria-expanded="false"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg>Filters<span class="cf-badge" data-draw="b-more"></span></button>
       <div class="cf-pop cf-pop-wide" id="pop-more"><p class="cf-pop-label">Show / hide</p><label class="cf-tog"><input type="checkbox" id="f-zero" checked><span>Hide campaigns nobody joined</span></label><label class="cf-tog"><input type="checkbox" id="f-gamb" checked><span>Hide casino &amp; betting</span></label><label class="cf-tog"><input type="checkbox" id="f-nonen" checked><span>Hide non-English / regional</span></label><label class="cf-tog"><input type="checkbox" id="f-face" checked><span>Hide on-camera</span></label><label class="cf-tog"><input type="checkbox" id="f-new"><span>New in the last 3 days</span></label><label class="cf-tog"><input type="checkbox" id="f-paying"><span>Already paying creators</span></label><label class="cf-tog"><input type="checkbox" id="f-podcast"><span>Podcasts only</span></label><label class="cf-tog"><input type="checkbox" id="f-cpm"><span>Pay per view only (no flat fee)</span></label></div></div>
     <div class="cf-dk-plats" role="group" aria-label="Platforms (pays on any selected)"><button type="button" class="cf-dk-icon cf-plat-btn" data-plat="TikTok" aria-pressed="false" aria-label="TikTok" title="TikTok"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M14 3c.4 2.3 1.9 3.8 4.2 4v3c-1.6 0-3-.5-4.2-1.3v6.1A5.3 5.3 0 1 1 8.7 9.5v3.1a2.3 2.3 0 1 0 2.3 2.3V3h3z"/></svg></button><button type="button" class="cf-dk-icon cf-plat-btn" data-plat="Instagram" aria-pressed="false" aria-label="Instagram" title="Instagram"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="17.2" cy="6.8" r="1.2"/></svg></button><button type="button" class="cf-dk-icon cf-plat-btn" data-plat="YouTube" aria-pressed="false" aria-label="YouTube" title="YouTube"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M21.6 7.2a2.6 2.6 0 0 0-1.8-1.8C18.2 5 12 5 12 5s-6.2 0-7.8.4A2.6 2.6 0 0 0 2.4 7.2 27 27 0 0 0 2 12a27 27 0 0 0 .4 4.8 2.6 2.6 0 0 0 1.8 1.8c1.6.4 7.8.4 7.8.4s6.2 0 7.8-.4a2.6 2.6 0 0 0 1.8-1.8A27 27 0 0 0 22 12a27 27 0 0 0-.4-4.8zM10 15V9l5.2 3L10 15z"/></svg></button><button type="button" class="cf-dk-icon cf-plat-btn" data-plat="X" aria-pressed="false" aria-label="X" title="X"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M17.8 3h3.1l-6.8 7.8L22 21h-6.2l-4.9-6.4L5.3 21H2.2l7.3-8.3L2 3h6.4l4.4 5.8L17.8 3zm-1.1 16.2h1.7L7.4 4.7H5.6l11.1 14.5z"/></svg></button><button type="button" class="cf-dk-icon cf-plat-btn" data-plat="Facebook" aria-pressed="false" aria-label="Facebook" title="Facebook"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M13.5 21v-7.5H16l.4-3h-2.9V8.6c0-.9.3-1.5 1.5-1.5h1.5V4.4c-.3 0-1.2-.1-2.2-.1-2.2 0-3.7 1.3-3.7 3.8v2.4H8v3h2.6V21h2.9z"/></svg></button></div>
     <span class="cf-dk-sep" aria-hidden="true"></span>
-    <button type="button" class="cf-dk-btn cf-dk-clear" id="f-reset">Clear</button>
-    <span class="cf-dk-count" data-draw="b-count">—</span>
+    <button type="button" class="cf-dk-btn cf-dk-clear" id="f-reset">Clear Filters</button>
+    <span class="cf-dk-count" data-draw="b-count" role="status" aria-live="polite">—</span>
   </div>
 <div class="cf-shell">
   <aside class="cf-side" aria-label="Sections and filters">
     <div class="cf-brand"><span class="cf-mark" aria-hidden="true"></span>Campaign Finder</div>
     <nav class="cf-nav" aria-label="Sections">
-      <a href="#picks">Best picks</a><a href="#kpis">Overview</a><a href="#map">Budget vs competition</a><a href="#cats">Categories</a><a href="#list">All campaigns</a>
+      <a href="#picks">Best Picks</a><a href="#kpis">Overview</a><a href="#map">Budget vs. Competition</a><a href="#cats">Categories</a><a href="#list">All Campaigns</a>
     </nav>
 
     <p class="cf-sidefoot" data-draw="side-updated">—</p>
@@ -252,28 +289,28 @@ window.dash = (() => {
 
 
   <section class="cf-picks" id="picks">
-    <div class="cf-sechead"><h2>Best picks right now</h2><p class="cf-hint">Most budget per creator among campaigns already paying out, with 3+ creators, under your filters.</p></div>
+    <div class="cf-sechead"><h2>Best Picks Right Now</h2><p class="cf-hint">Most budget per creator among campaigns already paying out, with 3+ creators, under your filters.</p></div>
     <div class="cf-pickgrid" data-draw="picks" data-source="campaigns"></div>
   </section>
 
 
 
   <section class="cf-kpis" id="kpis" aria-label="Summary">
-    <div class="cf-panel cf-kpi"><div class="cf-k">Matching campaigns</div><div class="cf-v" data-draw="k-count">—</div><div class="cf-s" data-draw="k-count-s">—</div></div>
-    <div class="cf-panel cf-kpi"><div class="cf-k">Budget still unspent</div><div class="cf-v" data-draw="k-left">—</div><div class="cf-s" data-draw="k-left-s">—</div></div>
-    <div class="cf-panel cf-kpi"><div class="cf-k">Median pay per 1K views</div><div class="cf-v" data-draw="k-rate">—</div><div class="cf-s">best platform rate per campaign</div></div>
-    <div class="cf-panel cf-kpi"><div class="cf-k">Median creators</div><div class="cf-v" data-draw="k-cr">—</div><div class="cf-s">competing in each campaign</div></div>
+    <div class="cf-panel cf-kpi"><div class="cf-k">Matching Campaigns</div><div class="cf-v" data-draw="k-count">—</div><div class="cf-s" data-draw="k-count-s">—</div></div>
+    <div class="cf-panel cf-kpi"><div class="cf-k">Budget Still Unspent</div><div class="cf-v" data-draw="k-left">—</div><div class="cf-s" data-draw="k-left-s">—</div></div>
+    <div class="cf-panel cf-kpi"><div class="cf-k">Median Pay per 1K Views</div><div class="cf-v" data-draw="k-rate">—</div><div class="cf-s">best platform rate per campaign</div></div>
+    <div class="cf-panel cf-kpi"><div class="cf-k">Median Creators</div><div class="cf-v" data-draw="k-cr">—</div><div class="cf-s">competing in each campaign</div></div>
   </section>
 
   <section class="cf-charts">
     <div class="cf-panel" id="map">
-      <h2>Budget left vs competition</h2>
+      <h2>Budget Left vs. Competition</h2>
       <p class="cf-hint">Top-left is the sweet spot: lots of money, few creators. Drag a box to filter the table; double-click to clear.</p>
       <div class="cf-chart" data-draw="scatter" data-source="campaigns"></div>
       <div class="cf-legend"><span><i style="background:var(--cf-c0)"></i>Clipping</span><span><i style="background:var(--cf-c1)"></i>UGC</span><span><i style="background:var(--cf-c2)"></i>Slideshow</span><span>Bigger dot = higher pay per 1K</span></div>
     </div>
     <div class="cf-panel" id="cats">
-      <h2>Budget left by category</h2>
+      <h2>Budget Left by Category</h2>
       <p class="cf-hint">Click bars to filter to those categories; click again to remove.</p>
       <div class="cf-chart" data-draw="bars" data-source="campaigns"></div>
     </div>
@@ -282,7 +319,7 @@ window.dash = (() => {
   <section class="cf-panel" id="list">
     <div class="cf-tablehead">
       <div><h2>Campaigns</h2><p class="cf-hint" data-draw="shown">—</p></div>
-      <button type="button" class="cf-btn" id="f-clearsel" hidden>Clear chart selection</button>
+      <button type="button" class="cf-btn" id="f-clearsel" hidden>Clear Chart Selection</button>
     </div>
     <div class="cf-tablewrap">
       <table class="cf-table" data-source="campaigns" data-row-key="id">
@@ -304,11 +341,11 @@ window.dash = (() => {
         <tbody data-draw="rows"></tbody>
       </table>
     </div>
-    <button type="button" class="cf-btn cf-more" id="f-more">Show 100 more</button>
+    <button type="button" class="cf-btn cf-more" id="f-more">Show 100 More</button>
   </section>
 
   <details class="cf-notes" id="notes">
-    <summary>How this was put together</summary>
+    <summary>How This Was Put Together</summary>
     <p>Every campaign card on Content Rewards Discover (All campaigns) is read every 4 hours, and every campaign with $1,500 or more left was opened to read its platforms, pay per platform, min and max payout and visible rules. Campaigns with less left show only the card data, so their platforms and max payout are blank.</p>
     <p>"Left / creator" is budget left divided by the number of creators who have joined. It is a rough measure of competition, not a forecast of earnings. "Spent / day" is how much the campaign paid out over roughly the last 24 hours. "New" means it launched or first appeared in the last 3 days. The casino, regional, on-camera and US-audience flags are keyword guesses from the title, description and visible rules. Most audience rules are hidden until you join, so check them before posting.</p>
   </details>
@@ -362,7 +399,10 @@ window.dash = (() => {
     });
   };
   window.CF_isNew = (r) => r.first_seen && (Date.now() - Date.parse(r.first_seen)) < 3 * 864e5;
-  window.CF_fmt = { money: d3.format('$,.0f'), k: (v) => v >= 1e6 ? d3.format('$,.2~f')(v / 1e6) + 'M' : v >= 1000 ? d3.format('$,.1~f')(v / 1000) + 'K' : d3.format('$,.0f')(v), rate: d3.format('$,.2~f'), int: d3.format(',') };
+  const NF = (o) => new Intl.NumberFormat(undefined, o);
+  const fMoney = NF({ style: 'currency', currency: 'USD', maximumFractionDigits: 0 }), fRate = NF({ style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 2 }),
+    fCompact = NF({ style: 'currency', currency: 'USD', notation: 'compact', maximumFractionDigits: 1 }), fInt = NF({ maximumFractionDigits: 0 });
+  window.CF_fmt = { money: (v) => fMoney.format(v), k: (v) => fCompact.format(v), rate: (v) => fRate.format(v), int: (v) => fInt.format(v) };
 
   // ---------- controls (listen only) ----------
   const CF = window.CF, $ = (id) => document.getElementById(id);
@@ -438,6 +478,49 @@ window.dash = (() => {
   const cc = $('cat-clear'); if (cc) cc.addEventListener('click', () => { CF.cats = []; after(); });
   if (reset) reset.addEventListener('click', () => window.CF_sync());
   window.CF_sync();
+  // ---------- URL reflects state (shareable, survives refresh) + undo for Clear Filters ----------
+  const CTRL = { 'f-zero': 'hideZero', 'f-gamb': 'hideGamb', 'f-nonen': 'hideNonEn', 'f-face': 'hideFace', 'f-new': 'isNew', 'f-paying': 'paying', 'f-podcast': 'podcast', 'f-cpm': 'cpm' };
+  const DEF = { q: '', type: '', cats: [], plats: [], minLeft: 1500, maxCr: null, minRate: null, maxAge: null, hideZero: true, isNew: false, hideGamb: true,
+    hideNonEn: true, hideFace: true, paying: false, podcast: false, cpm: false, sort: 'left_per_creator' };
+  const toControls = () => {
+    const q = $('f-q'); if (q) q.value = CF.q;
+    Object.entries(CTRL).forEach(([id, k]) => { const el = $(id); if (el) el.checked = !!CF[k]; });
+    window.CF_sync();
+  };
+  const fromURL = () => {
+    const p = new URLSearchParams(location.search);
+    Object.keys(DEF).forEach((k) => {
+      if (!p.has(k)) return; const v = p.get(k), d = DEF[k];
+      CF[k] = Array.isArray(d) ? v.split(',').filter(Boolean) : typeof d === 'boolean' ? v === '1' : (d === null || typeof d === 'number') ? (v === '' ? null : +v) : v;
+    });
+  };
+  let urlT = 0;
+  const toURL = () => {
+    clearTimeout(urlT); urlT = setTimeout(() => {
+      const p = new URLSearchParams();
+      Object.entries(DEF).forEach(([k, d]) => {
+        const v = CF[k]; const same = Array.isArray(d) ? v.join(',') === d.join(',') : v === d;
+        if (!same) p.set(k, Array.isArray(v) ? v.join(',') : typeof v === 'boolean' ? (v ? '1' : '0') : v == null ? '' : String(v));
+      });
+      const qs = p.toString(); history.replaceState(null, '', qs ? '?' + qs + location.hash : location.pathname + location.hash);
+    }, 150);
+  };
+  fromURL(); toControls();
+  const redraw0 = window.CF_redraw; window.CF_redraw = (x) => { redraw0(x); toURL(); };
+  // Clear Filters keeps an undo window instead of discarding the user's setup
+  const resetBtn = $('f-reset'); let snap = null, toastT = 0;
+  if (resetBtn) {
+    resetBtn.addEventListener('click', () => { snap = JSON.parse(JSON.stringify(CF)); }, true);
+    resetBtn.addEventListener('click', () => {
+      const t = $('cf-toast'); if (!t) return;
+      t.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => { t.hidden = true; }, 6000);
+    });
+  }
+  const undo = $('cf-undo');
+  if (undo) undo.addEventListener('click', () => {
+    if (snap) { Object.assign(CF, snap); toControls(); window.CF_redraw(); }
+    const t = $('cf-toast'); if (t) t.hidden = true;
+  });
   // series colours as CSS variables for the legend
   document.querySelectorAll('.cf, .cf-side').forEach((el) => { (dash.colors || []).slice(0, 3).forEach((c, i) => el.style.setProperty(`--cf-c${i}`, c)); });
 </script>
@@ -477,7 +560,7 @@ window.dash = (() => {
     T(el, `Showing ${F.int(n)} of ${F.int(v.length)}. Click a column to sort.`);
     const m = document.getElementById('f-more'); if (m) m.hidden = v.length <= window.CF.limit;
     const c = document.getElementById('f-clearsel'); if (c) c.hidden = !window.CF.brush;
-    document.querySelectorAll('.cf-th[data-sort]').forEach((th) => th.classList.toggle('cf-sorted', th.dataset.sort === window.CF.sort));
+    document.querySelectorAll('.cf-th[data-sort]').forEach((th) => { const on = th.dataset.sort === window.CF.sort; th.classList.toggle('cf-sorted', on); if (on) th.setAttribute('aria-sort', /_asc$|^campaign$|^type$/.test(window.CF.sort) ? 'ascending' : 'descending'); else th.removeAttribute('aria-sort'); });
   });
 
   // ---------- top picks ----------
@@ -489,7 +572,7 @@ window.dash = (() => {
     top.forEach((r, i) => {
       const a = document.createElement('a'); a.className = 'cf-pick'; a.href = r.url; a.target = '_blank'; a.rel = 'noopener';
       const rank = document.createElement('span'); rank.className = 'cf-pick-rank'; rank.textContent = '#' + (i + 1);
-      const t = document.createElement('span'); t.className = 'cf-pick-title'; t.textContent = r.campaign;
+      const t = document.createElement('span'); t.className = 'cf-pick-title'; t.translate = false; t.textContent = r.campaign;
       const o = document.createElement('span'); o.className = 'cf-pick-org'; o.textContent = `${r.org} · ${r.category}`;
       const big = document.createElement('span'); big.className = 'cf-pick-big'; big.textContent = F.k(r.left);
       const bl = document.createElement('span'); bl.className = 'cf-pick-biglabel'; bl.textContent = 'still up for grabs';
@@ -533,8 +616,8 @@ window.dash = (() => {
       const tr = document.createElement('tr'); tr.dataset.key = r.id;
       const td = (txt) => { const c = document.createElement('td'); c.textContent = txt; tr.append(c); return c; };
       const first = document.createElement('td');
-      const a = document.createElement('a'); a.href = r.url; a.target = '_blank'; a.rel = 'noopener'; a.textContent = r.campaign;
-      const o = document.createElement('span'); o.className = 'cf-org'; o.textContent = `${r.org} · ${r.category}`;
+      const a = document.createElement('a'); a.href = r.url; a.target = '_blank'; a.rel = 'noopener'; a.translate = false; a.textContent = r.campaign;
+      const o = document.createElement('span'); o.className = 'cf-org'; o.translate = false; o.textContent = `${r.org} · ${r.category}`;
       first.append(a, o); tr.append(first);
       td(r.type);
       const pc = document.createElement('td');

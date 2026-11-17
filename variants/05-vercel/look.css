@@ -16,3 +16,36 @@
 .cf-table td:first-child { font-family: Manrope, sans-serif; font-size: 13px; }
 .cf-chip:has(input:checked) { border-color: #f2b84b; color: #f2b84b; }
 .cf-plat-tiktok, .cf-plat-x { background: #2b3a55; }
+
+/* ===== Vercel guidelines pass ===== */
+html { color-scheme: dark; scroll-padding-top: 92px; -webkit-tap-highlight-color: rgba(242,184,75,.18); }
+@media (pointer: fine) { html { overscroll-behavior: none; } }
+button, a, input, label, .cf-th { touch-action: manipulation; }
+/* sticky bar never covers what has focus or what a link jumps to */
+#picks, #kpis, #map, #cats, #list, h2 { scroll-margin-top: 92px; }
+:focus-visible { outline: 2px solid #f2b84b !important; outline-offset: 2px; }
+.cf-tog:focus-within, .cf-chip:focus-within { outline: 2px solid #f2b84b; outline-offset: 1px; }
+/* headings without widows; long names wrap instead of overflowing */
+h1, h2, .cf-pick-title { text-wrap: balance; }
+.cf-take, .cf-hint, details p { text-wrap: pretty; }
+.cf-pick-title, .cf-table td:first-child a, .cf-org { overflow-wrap: anywhere; }
+.cf-pick, .cf-pick > * { min-width: 0; }
+/* big table: let the browser skip rendering rows off screen */
+.cf-table tbody tr { content-visibility: auto; contain-intrinsic-size: auto 56px; }
+/* menus that scroll keep the scroll inside */
+.cf-pop { overscroll-behavior: contain; }
+/* skip link */
+.cf-skip { position: absolute; left: 16px; top: -60px; z-index: 100; background: #f2b84b; color: #0a1220; padding: 10px 14px; border-radius: 10px; font-weight: 700; text-decoration: none; }
+.cf-skip:focus-visible { top: 12px; }
+/* undo toast */
+.cf-toast { position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); z-index: 80;
+  display: flex; align-items: center; gap: 12px; padding: 10px 10px 10px 16px; background: #15233a; color: #e8eef7; border: 1px solid #2a3a56;
+  border-radius: 12px; box-shadow: 0 12px 30px rgba(0,0,0,.45); }
+.cf-toast[hidden] { display: none !important; }
+/* hover and focus are more prominent than rest */
+.cf-dk-btn:hover, .cf-dk-btn:focus-visible { background: rgba(255,255,255,.12) !important; color: #fff !important; }
+.cf-th:hover { color: #e8eef7 !important; }
+.cf-th[aria-sort] { color: #f2b84b !important; }
+.cf-th[aria-sort="descending"]::after { content: " \2193"; } .cf-th[aria-sort="ascending"]::after { content: " \2191"; }
+.cf-mark { background: #f2b84b !important; border-radius: 6px !important; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition-duration: 0ms !important; animation: none !important; } }
