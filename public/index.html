@@ -7,6 +7,7 @@
 <meta name="description" content="Find the best Content Rewards campaigns for your conditions. Refreshed every 4 hours.">
 <meta name="theme-color" content="#f6f7f9" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#111418" media="(prefers-color-scheme: dark)">
+<script>(function(){var p=new URLSearchParams(location.search).get("palette");if(p&&/^(sage|harbor|amber)$/.test(p))document.documentElement.setAttribute("data-palette",p);})();</script>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap">
 <style>
@@ -24,6 +25,22 @@
     :root { color-scheme: dark; --bg: #111418; --surface: #171b21; --raised: #1f242c; --line: #262c35; --line-2: #333a45;
       --text: #e6e9ee; --text-2: #a7afbc; --text-3: #7d8696; --accent: #6cc0ad; --accent-soft: #1b2e2a; --on-accent: #0f1a17;
       --good: #6fc48f; --warn: #d9a54a; --bad: #e07a73; }
+  }
+
+  /* ---- palettes: ?palette=sage | harbor | amber (light + dark each) ---- */
+  html[data-palette="sage"] { --bg: #f4f5f1; --surface: #ffffff; --raised: #eceee8; --line: #e1e4dc; --line-2: #ccd1c6;
+    --text: #1f2620; --text-2: #4f5a51; --text-3: #7f897f; --accent: #3d6b52; --accent-soft: #e3eee6; --on-accent: #ffffff; --good: #3d6b52; --warn: #9a6a1c; }
+  html[data-palette="harbor"] { --bg: #f3f5f8; --surface: #ffffff; --raised: #e9edf3; --line: #dde3eb; --line-2: #c8d1dd;
+    --text: #172031; --text-2: #4a5568; --text-3: #7d879a; --accent: #2c5a8c; --accent-soft: #e4ecf6; --on-accent: #ffffff; --good: #2f7d57; --warn: #9a6a1c; }
+  html[data-palette="amber"] { --bg: #f6f5f2; --surface: #ffffff; --raised: #eeece7; --line: #e4e1da; --line-2: #d1ccc2;
+    --text: #22201c; --text-2: #57524a; --text-3: #8a847a; --accent: #8a5a12; --accent-soft: #f4ead8; --on-accent: #ffffff; --good: #3f7a4f; --warn: #8a5a12; }
+  @media (prefers-color-scheme: dark) {
+    html[data-palette="sage"] { --bg: #121512; --surface: #181c18; --raised: #20251f; --line: #283028; --line-2: #343d34;
+      --text: #e4e9e2; --text-2: #a9b3a8; --text-3: #7c877b; --accent: #8fc3a2; --accent-soft: #1d2c22; --on-accent: #0f1912; --good: #8fc3a2; --warn: #d6a95a; }
+    html[data-palette="harbor"] { --bg: #10141b; --surface: #161b24; --raised: #1d2430; --line: #252d3a; --line-2: #313b4b;
+      --text: #e5eaf2; --text-2: #a6b0c0; --text-3: #7a8598; --accent: #8db7e6; --accent-soft: #1a2638; --on-accent: #0e1623; --good: #7cc79c; --warn: #d6a95a; }
+    html[data-palette="amber"] { --bg: #141311; --surface: #1b1a17; --raised: #23211d; --line: #2d2a25; --line-2: #3a362f;
+      --text: #ebe7df; --text-2: #b0a99d; --text-3: #847e73; --accent: #e2b25e; --accent-soft: #2e2618; --on-accent: #1a1408; --good: #86c08f; --warn: #e2b25e; }
   }
   * { box-sizing: border-box; }
   html { -webkit-text-size-adjust: 100%; }
@@ -66,7 +83,7 @@
   .seg button em, .chip em { font-style: normal; font-size: 12px; color: var(--text-3); font-variant-numeric: tabular-nums; }
   .chip { height: 34px; padding: 0 10px; display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); background: var(--surface); border-radius: 999px; cursor: pointer; color: var(--text-2); font-size: 14px; }
   .chip:hover { border-color: var(--line-2); color: var(--text); }
-  .chip[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); color: var(--text); }
+  .chip[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); color: var(--text); font-weight: 500; }
   .chip[aria-pressed="true"] svg { color: var(--accent); }
   .chip[disabled] { opacity: .45; cursor: default; }
   .lbl { color: var(--text-3); font-size: 13px; margin-right: 2px; }
@@ -294,6 +311,7 @@
     const so = S.sort.map((s) => s.join(':')).join(','); if (so !== 'left_per_creator:desc') p.set('sort', so);
     if (S.page > 1) p.set('page', S.page); if (S.size !== 25) p.set('size', S.size);
     TOGGLES.forEach(([k, d]) => { if (S[k] !== d) p.set(k, S[k] ? '1' : '0'); });
+    const pal = document.documentElement.getAttribute('data-palette'); if (pal) p.set('palette', pal);
     const qs = p.toString(); history.replaceState(null, '', qs ? '?' + qs : location.pathname);
   };
 
