@@ -116,7 +116,8 @@
   .open-filters em { font-style: normal; font-family: var(--mono); font-size: 11px; padding: 0 6px; border-radius: 99px; background: var(--ink); color: var(--on-ink); }
   .open-filters em:empty { display: none; }
 
-  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow); }
+  .card { background: var(--surface); border: 1.5px solid var(--line-2); border-radius: 20px; box-shadow: var(--shadow); overflow: hidden; }
+  .card.results { overflow: visible; }
   .stats { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); margin-bottom: 16px; }
   .stat { padding: 14px 18px; min-width: 0; }
   .stat + .stat { border-left: 1px solid var(--line); }
@@ -166,7 +167,7 @@
   table { width: 100%; border-collapse: collapse; }
   th, td { padding: 12px 12px; text-align: right; border-bottom: 1px solid var(--line); white-space: nowrap; }
   th.l, td.l { text-align: left; }
-  thead th { font-size: 12.5px; font-weight: 500; color: var(--text-3); background: var(--raised); }
+  thead th { font-size: 12.5px; font-weight: 500; color: var(--text-3); background: var(--raised); border-bottom: 1.5px solid var(--line-2); }
   :root[data-theme="dark"] thead th { background: var(--surface); }
   th button { all: unset; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; border-radius: 4px; }
   th button:hover { color: var(--text); }
@@ -238,6 +239,84 @@
     td.hide-m { display: none; }
     .cname .ico { opacity: 1; }
   }
+
+  /* ---- v5: compact sidebar, toolbar rows, mobile table ---- */
+  .side-head { padding: 14px 14px 8px; }
+  .side-title { padding: 4px 14px 8px; font-size: 13px; }
+  .side-body { padding: 0 10px 10px; }
+  details.sec { border-radius: 12px; margin-bottom: 6px; }
+  details.sec > summary { padding: 9px 10px; font-size: 13px; }
+  .sec-body { padding: 0 10px 10px; gap: 5px; }
+  .chip { height: 28px; padding: 0 9px; font-size: 13px; gap: 5px; }
+  .chip svg { width: 13px; height: 13px; }
+  .check { min-height: 28px; font-size: 13px; }
+  .switch { min-height: 30px; font-size: 13px; }
+  .side-foot { padding: 10px; }
+  .app { grid-template-columns: 248px minmax(0, 1fr) !important; }
+  .toolbar-2 { justify-content: space-between; }
+  .ranges { display: flex; gap: 8px; flex-wrap: wrap; }
+  .resinfo { display: flex; align-items: center; gap: 10px; color: var(--text-2); font-size: 13px; white-space: nowrap; }
+  .dd.on .dd-btn { background: var(--ink); border-color: var(--ink); }
+  .dd.on .dd-btn .k { color: var(--on-ink); opacity: .7; } .dd.on .dd-btn .v, .dd.on .dd-btn .chev { color: var(--on-ink); }
+  .dd-btn .kv { display: inline-flex; gap: 6px; align-items: baseline; min-width: 0; }
+  .dd-menu.left { right: auto; left: 0; }
+  .dd-opt .t { flex: 1; } .dd-opt em.n { font-style: normal; font-family: var(--mono); font-size: 11.5px; color: var(--text-3); }
+  .dd-opt.zero { color: var(--text-3); }
+  .pg-note { color: var(--text-3); font-size: 13px; }
+  .pager { border-top: 1.5px solid var(--line-2); }
+  .toolbar { border-bottom-color: var(--line); }
+  td.name .m-plats { display: none; }
+  .card.results > .scroll { border-radius: 0 0 20px 20px; }
+  @media (max-width: 1080px) { .app { grid-template-columns: minmax(0, 1fr) !important; } .open-filters { display: inline-flex; } .top .open-filters { display: none; } }
+  @media (min-width: 1081px) { .open-filters { display: none !important; } }
+  @media (max-width: 680px) {
+    .main { padding: 14px 10px 32px; }
+    .top { flex-wrap: nowrap !important; align-items: center; margin-bottom: 12px; }
+    .top h1 { font-size: 19px; } .top .sub { font-size: 12.5px; }
+    .stats { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; margin-bottom: 12px; }
+    .stats .stat { padding: 10px 10px; border-left: 0 !important; border-top: 0 !important; }
+    .stats .stat:nth-child(3n+2), .stats .stat:nth-child(3n) { border-left: 1px solid var(--line) !important; }
+    .stats .stat:nth-child(n+4) { border-top: 1px solid var(--line) !important; }
+    .stats .stat span { font-size: 11px; white-space: normal; line-height: 1.25; min-height: 2.5em; }
+    .stats .stat b { font-size: 16px !important; margin-top: 2px; }
+    .stats { border-radius: 16px; }
+    .toolbar { padding: 10px; gap: 8px; }
+    .toolbar .search { flex: 1 1 100%; order: -1; }
+    .toolbar .open-filters { flex: 1 1 0; height: 40px; justify-content: center; }
+    .toolbar #dd-sort { flex: 1 1 0; } .toolbar #dd-sort .dd-btn { width: 100%; height: 40px; justify-content: space-between; }
+    .ranges { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); width: 100%; gap: 6px; }
+    .ranges .dd-btn { width: 100%; height: 46px; padding: 0 8px; }
+    .ranges .dd-btn .kv { flex-direction: column; gap: 0; align-items: flex-start; flex: 1; overflow: hidden; }
+    .ranges .dd-btn .k { font-size: 11px; } .ranges .dd-btn .v { font-size: 13px; max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
+    .ranges .dd-menu { min-width: 180px; }
+    .resinfo { width: 100%; justify-content: space-between; }
+    /* the table stays a table, locked to the screen: no sideways scroll, header stays put */
+    .card.results > .scroll { overflow: visible; }
+    table { display: table; table-layout: fixed; width: 100%; }
+    thead { display: table-header-group !important; }
+    tbody { display: table-row-group !important; }
+    tr { display: table-row !important; padding: 0 !important; }
+    th, td { display: table-cell !important; padding: 10px 6px !important; white-space: nowrap; }
+    thead th { position: sticky; top: 0; z-index: 3; font-size: 11.5px; }
+    th:first-child, td:first-child { padding-left: 10px !important; } th:last-child, td:last-child { padding-right: 10px !important; }
+    td.rank, th:first-child { width: 28px; }
+    td.rank { position: static !important; font-size: 11.5px; }
+    td.name { min-width: 0 !important; max-width: none !important; white-space: normal !important; padding-right: 8px !important; }
+    td.name .cname { font-size: 13.5px; line-height: 1.3; display: inline; }
+    td.name .cname .ico { display: none; }
+    td.name .meta { font-size: 11.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    td.name .m-plats { display: inline-flex; gap: 6px; margin-top: 4px; color: var(--text-3); }
+    td.name .m-plats svg { width: 12px; height: 12px; fill: currentColor; }
+    td.name .badge { margin-left: 4px; font-size: 10px; line-height: 16px; }
+    td.pays, th[data-k="platforms"], td.hide-m, th[data-k="max_payout"], th[data-k="age_days"] { display: none !important; }
+    th[data-k="rate"], td[data-l="Pay / 1K"] { width: 58px; }
+    th[data-k="left"], td[data-l="Money left"] { width: 76px; }
+    th[data-k="creators"], td[data-l="Creators"] { width: 46px; }
+    td.n { font-size: 12.5px; }
+    td[data-l]::before { content: none !important; }
+    th .caret { display: none; } th[aria-sort] .caret { display: inline; }
+    .pager { justify-content: center; } .pg-note { display: none; }
+  }
   @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
 </head>
@@ -295,18 +374,23 @@
       <div class="stat"><span>New this week</span><b id="s-new">—</b></div>
     </section>
 
-    <section class="card" aria-label="Campaigns">
+    <section class="card results" aria-label="Campaigns">
       <div class="toolbar">
         <label class="search"><svg class="ico"><use href="#i-search"/></svg>
           <input id="q" type="search" placeholder="Search campaigns or brands" autocomplete="off" spellcheck="false" aria-label="Search campaigns or brands">
           <button class="x" id="clear-q" type="button" aria-label="Clear search" hidden><svg class="ico"><use href="#i-x"/></svg></button>
         </label>
+        <button class="iconbtn open-filters" id="open-filters-2" type="button"><svg class="ico"><use href="#i-filter"/></svg>Filters <em id="open-n-2"></em></button>
         <div class="dd" id="dd-sort"></div>
+      </div>
+      <div class="toolbar toolbar-2">
+        <div class="ranges"><div class="dd rng" id="dd-minLeft"></div><div class="dd rng" id="dd-maxCr"></div><div class="dd rng" id="dd-minRate"></div></div>
+        <div class="resinfo"><span id="range" role="status" aria-live="polite"></span><div class="dd" id="dd-size"></div></div>
       </div>
       <div class="active" id="active" aria-label="Active filters"></div>
       <div class="scroll"><table><thead><tr id="head"></tr></thead><tbody id="rows"></tbody></table></div>
       <nav class="pager" aria-label="Pages">
-        <div class="pager-l"><span id="range" role="status" aria-live="polite"></span><div class="dd" id="dd-size"></div></div>
+        <span class="pg-note" id="pg-note"></span>
         <div class="pages" id="pages"></div>
       </nav>
     </section>
@@ -333,8 +417,8 @@
     maxCr: { label: 'Creators', opts: [null, 10, 25, 50, 100], fmt: (v) => `${v} or fewer`, test: (r, v) => r.creators <= v },
     minRate: { label: 'Pay per 1K', opts: [null, 1, 1.5, 2, 3], fmt: (v) => rateF.format(v) + '+', test: (r, v) => r.rate >= v && !r.per_post },
   };
-  const COLS = [['rank', '#', 'l'], ['campaign', 'Campaign', 'l'], ['type', 'Type', 'l'], ['platforms', 'Pays on', 'l'], ['rate', 'Pay / 1K'], ['left', 'Money left'],
-    ['creators', 'Creators'], ['left_per_creator', 'Per creator'], ['max_payout', 'Max / clip'], ['age_days', 'Age']];
+  const COLS = [['rank', '#', 'l'], ['campaign', 'Campaign', 'l'], ['platforms', 'Pays on', 'l'], ['rate', 'Pay / 1K'], ['left', 'Money left'],
+    ['creators', 'Creators'], ['max_payout', 'Max / clip'], ['age_days', 'Age']];
   const SORTS = [['left_per_creator:desc', 'Best value'], ['left:desc', 'Most money left'], ['creators:asc', 'Fewest creators'], ['rate:desc', 'Highest pay per 1K'],
     ['max_payout:desc', 'Highest max per clip'], ['age_days:asc', 'Newest'], ['spent_per_day:desc', 'Paying out fastest']];
   const DEF = { q: '', types: [], plats: [], cats: [], minLeft: 1500, maxCr: null, minRate: null, sort: [['left_per_creator', 'desc']], page: 1, size: 25,
@@ -354,7 +438,7 @@
 
   // ---------- drawer (tablet/phone) ----------
   const drawer = (on) => { $('side').classList.toggle('open', on); $('scrim').classList.toggle('open', on); if (on) $('side-close').focus(); };
-  $('open-filters').onclick = () => drawer(true); $('side-close').onclick = () => drawer(false); $('scrim').onclick = () => drawer(false);
+  $('open-filters').onclick = () => drawer(true); $('open-filters-2').onclick = () => drawer(true); $('side-close').onclick = () => drawer(false); $('scrim').onclick = () => drawer(false);
   $('show-results').onclick = () => { drawer(false); document.querySelector('.stats').scrollIntoView({ block: 'start', behavior: 'smooth' }); };
   $('clear-all').onclick = reset;
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && $('side').classList.contains('open')) drawer(false); });
@@ -423,7 +507,6 @@
   };
   const buildSide = () => {
     section('types', 'Type'); section('plats', 'Pays on');
-    Object.entries(RANGES).forEach(([k, R]) => section(k, R.label));
     section('cats', 'Category', true); section('show', 'Show', false);
     const box = el('div', { class: 'checks' });
     const ms = el('label', { class: 'mini-search' }, icon('i-search'), el('input', { type: 'search', placeholder: 'Find a category', 'aria-label': 'Find a category', id: 'cat-q' }));
@@ -448,15 +531,11 @@
     SEC.types.val.textContent = S.types.length ? S.types.join(', ') : 'All'; SEC.types.val.classList.toggle('on', !!S.types.length);
     SEC.plats.body.replaceChildren(...PLATS.map((p) => chip(p, S.plats.includes(p), countIf('plats', (r) => (r.platforms || '').split(', ').includes(p)), () => { S.plats = S.plats.includes(p) ? S.plats.filter((x) => x !== p) : [...S.plats, p]; go(); }, 'p-' + p)));
     SEC.plats.val.textContent = S.plats.length ? `${S.plats.length} selected` : 'Any'; SEC.plats.val.classList.toggle('on', !!S.plats.length);
-    Object.entries(RANGES).forEach(([k, R]) => {
-      SEC[k].body.replaceChildren(...R.opts.map((v) => chip(v == null ? 'Any' : R.fmt(v), S[k] === v, countIf(k, (r) => v == null || R.test(r, v)), () => { S[k] = v; go(); })));
-      SEC[k].val.textContent = S[k] == null ? 'Any' : R.fmt(S[k]); SEC[k].val.classList.toggle('on', S[k] != null);
-    });
     paintCats();
     SEC.cats.val.textContent = S.cats.length ? (S.cats.length === 1 ? S.cats[0] : `${S.cats.length} selected`) : 'All'; SEC.cats.val.classList.toggle('on', !!S.cats.length);
     TOGGLES.forEach(([k]) => { $('t-' + k).checked = S[k]; });
     const ch = TOGGLES.filter(([k, d]) => S[k] !== d).length; SEC.show.val.textContent = ch ? `${ch} changed` : 'Default'; SEC.show.val.classList.toggle('on', !!ch);
-    const n = nChanged(); $('side-n').textContent = n ? String(n) : ''; $('open-n').textContent = n ? String(n) : '';
+    const n = nChanged(), sideN = S.types.length + S.plats.length + S.cats.length + TOGGLES.filter(([k, d]) => S[k] !== d).length; $('side-n').textContent = sideN ? String(sideN) : ''; $('open-n').textContent = sideN ? String(sideN) : ''; $('open-n-2').textContent = sideN ? String(sideN) : '';
   };
 
   // ---------- dropdowns (sort, rows) ----------
@@ -465,12 +544,14 @@
   document.addEventListener('click', (e) => { if (openDD && !openDD.root.contains(e.target)) closeDD(); });
   const dropdown = (root, cfg) => {
     const btn = el('button', { type: 'button', class: 'dd-btn', 'aria-haspopup': 'listbox', 'aria-expanded': 'false' });
-    const menu = el('ul', { class: 'dd-menu' + (cfg.up ? ' up' : ''), role: 'listbox', tabindex: '-1', 'aria-label': cfg.label });
+    const menu = el('ul', { class: 'dd-menu' + (cfg.up ? ' up' : '') + (cfg.left ? ' left' : ''), role: 'listbox', tabindex: '-1', 'aria-label': cfg.label });
     root.replaceChildren(btn, menu); let act = 0;
     const items = () => [...menu.querySelectorAll('.dd-opt')];
     const paint = () => {
-      btn.replaceChildren(...(cfg.icon ? [icon(cfg.icon)] : []), el('span', { class: 'k', text: cfg.label }), el('span', { class: 'v', text: cfg.show() }), icon('i-chev', 'ico chev'));
-      menu.replaceChildren(...cfg.options().map((o) => { const li = el('li', { class: 'dd-opt', role: 'option', 'aria-selected': String(String(cfg.value()) === String(o.v)) }, icon('i-check', 'ico ck'), el('span', { text: o.t }));
+      btn.replaceChildren(...(cfg.icon ? [icon(cfg.icon)] : []), el('span', { class: 'kv' }, el('span', { class: 'k', text: cfg.label }), el('span', { class: 'v', text: cfg.show() })), icon('i-chev', 'ico chev'));
+      root.classList.toggle('on', !!(cfg.isOn && cfg.isOn()));
+      menu.replaceChildren(...cfg.options().map((o) => { const li = el('li', { class: 'dd-opt', role: 'option', 'aria-selected': String(String(cfg.value()) === String(o.v)) }, icon('i-check', 'ico ck'), el('span', { class: 't', text: o.t }), o.n != null ? el('em', { class: 'n', text: intF.format(o.n) }) : '');
+        if (o.n === 0) li.classList.add('zero');
         li.onclick = (e) => { e.stopPropagation(); cfg.set(o.v); closeDD(); btn.focus(); }; return li; }));
     };
     const hl = (i) => { const it = items(); if (!it.length) return; act = (i + it.length) % it.length; it.forEach((x, j) => x.classList.toggle('act', j === act)); };
@@ -491,7 +572,10 @@
     buildSide();
     DD.sort = dropdown($('dd-sort'), { label: 'Sort', icon: 'i-sort', options: () => SORTS.map(([v, t]) => ({ v, t })), value: () => S.sort[0] ? S.sort[0].join(':') : '',
       set: (v) => { S.sort = [v.split(':')]; go(); }, show: () => { const k = S.sort[0] ? S.sort[0].join(':') : ''; const f = SORTS.find((s) => s[0] === k); return f ? f[1] : (COLS.find((c) => c[0] === S.sort[0][0]) || [, 'Custom'])[1]; } });
-    DD.size = dropdown($('dd-size'), { label: 'Rows', up: true, options: () => [25, 50, 100].map((v) => ({ v, t: String(v) })), value: () => S.size, set: (v) => { S.size = +v; go(); }, show: () => String(S.size) });
+    Object.entries(RANGES).forEach(([k, R], i) => { DD[k] = dropdown($('dd-' + k), { label: R.label, left: i < 2,
+      options: () => R.opts.map((v) => ({ v: v == null ? '' : v, t: v == null ? 'Any' : R.fmt(v), n: countIf(k, (r) => v == null || R.test(r, v)) })),
+      value: () => S[k] ?? '', set: (v) => { S[k] = v === '' ? null : +v; go(); }, isOn: () => S[k] != null, show: () => S[k] == null ? 'Any' : R.fmt(S[k]) }); });
+    DD.size = dropdown($('dd-size'), { label: 'Rows', options: () => [25, 50, 100].map((v) => ({ v, t: String(v) })), value: () => S.size, set: (v) => { S.size = +v; go(); }, show: () => String(S.size) });
     $('head').replaceChildren(...COLS.map(([k, label, cls]) => {
       if (k === 'rank') return el('th', { scope: 'col', class: 'l', text: '#' });
       const b = el('button', { type: 'button' }, label); const th = el('th', { scope: 'col', class: cls || null, 'data-k': k }, b);
@@ -510,7 +594,7 @@
   const ageText = (r) => r.age_days == null ? '—' : r.age_days < 1 ? 'Today' : r.age_days < 7 ? `${r.age_days}d` : r.age_days < 60 ? `${Math.round(r.age_days / 7)}w` : `${Math.round(r.age_days / 30)}mo`;
   const render = () => {
     $('q').value = S.q; $('clear-q').hidden = !S.q;
-    paintSide(); DD.sort.paint(); DD.size.paint();
+    paintSide(); Object.values(DD).forEach((d) => d.paint());
     const list = sorted(ROWS.filter((r) => pass(r)));
     // numbers strip
     $('s-count').textContent = intF.format(list.length);
@@ -547,16 +631,18 @@
       if (isNew(r)) name.append(el('span', { class: 'badge b-new', text: 'New' }));
       if (r.us_rule) name.append(el('span', { class: 'badge b-warn', title: 'Has a US or Tier 1 audience rule', text: r.geo ? `US ${r.geo}` : 'US rule' }));
       name.append(el('span', { class: 'meta', translate: 'no', text: `${r.org}, ${r.category}` }));
+      const plIcons = () => (r.platforms || '').split(', ').filter(Boolean).map((p) => { const s = icon('p-' + p, ''); s.setAttribute('aria-hidden', 'true'); return s; });
+      name.append(el('span', { class: 'm-plats' }, ...plIcons()));
       const pl = el('span', { class: 'plats' }, ...(r.platforms || '').split(', ').filter(Boolean).map((p) => { const s = icon('p-' + p, ''); s.removeAttribute('aria-hidden'); s.setAttribute('role', 'img'); s.setAttribute('aria-label', p); const ti = document.createElementNS('http://www.w3.org/2000/svg', 'title'); ti.textContent = p; s.prepend(ti); return s; }));
       const n = (k, text, label, extra) => el('td', { class: ['n', k === key ? 'hl' : '', extra || ''].join(' ').trim(), 'data-l': label, text });
       tb.append(el('tr', {}, el('td', { class: 'rank', text: String(start + i + 1) }), name,
-        el('td', { class: 'l', 'data-l': 'Type' }, el('span', { class: 'type ' + r.type }, el('i'), r.type)),
-        el('td', { class: 'l', 'data-l': 'Pays on' }, r.platforms ? pl : el('span', { class: 'muted', text: '—' })),
+        el('td', { class: 'l pays', 'data-l': 'Pays on' }, r.platforms ? pl : el('span', { class: 'muted', text: '—' })),
         n('rate', r.per_post ? 'Per post' : rateF.format(r.rate), 'Pay / 1K'), n('left', money.format(r.left), 'Money left'),
-        n('creators', intF.format(r.creators), 'Creators'), n('left_per_creator', money.format(r.left_per_creator), 'Per creator'),
+        n('creators', intF.format(r.creators), 'Creators'),
         n('max_payout', r.max_payout != null ? money.format(r.max_payout) : '—', 'Max / clip', 'hide-m'), n('age_days', ageText(r), 'Age', 'hide-m')));
     });
     $('range').textContent = list.length ? `Results ${intF.format(start + 1)}–${intF.format(start + view.length)} of ${intF.format(list.length)}` : 'No results';
+    $('pg-note').textContent = pages > 1 ? `Page ${S.page} of ${pages}` : '';
     const pb = (label, page, o = {}) => { const b = el('button', { type: 'button', 'aria-label': o.aria || `Page ${page}`, 'aria-current': o.cur ? 'page' : null }, label); if (o.dis) b.disabled = true; else b.onclick = () => { S.page = page; render(); document.querySelector('.toolbar').scrollIntoView({ block: 'start', behavior: 'smooth' }); }; return b; };
     const nums = []; let last = 0;
     [...new Set([1, pages, S.page - 1, S.page, S.page + 1])].filter((x) => x >= 1 && x <= pages).sort((a, b) => a - b).forEach((x) => { if (x - last > 1) nums.push(el('span', { class: 'gap', text: '…' })); nums.push(pb(String(x), x, { cur: x === S.page })); last = x; });
