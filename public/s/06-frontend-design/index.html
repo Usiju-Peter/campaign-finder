@@ -1,7 +1,7 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Campaign Finder · Frontend Design (Anthropic)</title>
 <meta name="description" content="Every Content Rewards campaign, refreshed every 4 hours. Design pass: Frontend Design (Anthropic).">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800&family=Schibsted+Grotesk:wght@400;500;700&display=swap">
 <style>
 #dash-root { max-width: 1480px; margin: 0 auto; padding-block: 0 48px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
 body { margin: 0; background: var(--color-bg); color: var(--color-fg); font: 14px/1.45 var(--font-anthropic-sans); }
@@ -27,6 +27,61 @@ body { margin: 0; background: var(--color-bg); color: var(--color-fg); font: 14p
 .cf-table td:first-child { font-family: Manrope, sans-serif; font-size: 13px; }
 .cf-chip:has(input:checked) { border-color: #f2b84b; color: #f2b84b; }
 .cf-plat-tiktok, .cf-plat-x { background: #2b3a55; }
+
+/* ===== Frontend Design pass: the scouting board =====
+   navy #0b1626 · panel #12203a · line #22324f · ink #eef2f8 · muted #94a3bb · gold #f2b84b (money only)
+   Display: Big Shoulders Display (scoreboard). Text: Schibsted Grotesk. Left-aligned throughout. */
+:root { --navy:#0b1626; --panel:#12203a; --line:#22324f; --ink:#eef2f8; --muted:#94a3bb; --gold:#f2b84b; --paying:#4fd1a0;
+  --display: 'Big Shoulders Display', 'Arial Narrow', sans-serif; --text: 'Schibsted Grotesk', system-ui, sans-serif;
+  --color-bg: var(--navy); --color-panel: var(--panel); --color-border-line: var(--line); --color-fg: var(--ink); --color-fg-muted: var(--muted);
+  --font-anthropic-sans: var(--text); --font-anthropic-serif: var(--display); --cds-radius: 10px; }
+body { font-family: var(--text); background: var(--navy); }
+
+/* hero: the finding is the headline, in one colour */
+.cf-hero { background: none !important; border: 0 !important; padding: 36px 0 12px !important; }
+.cf-hero h1.cf-board { font-family: var(--display) !important; font-weight: 800 !important; font-size: clamp(44px, 6.2vw, 92px) !important; line-height: .95 !important;
+  letter-spacing: -.005em; color: var(--ink); max-width: 16ch; margin: 0 0 18px !important; text-wrap: balance; font-variant-numeric: tabular-nums; }
+.cf-take { font-size: 17px !important; line-height: 1.55; max-width: 62ch; color: var(--muted) !important; }
+.cf-take b { color: var(--ink) !important; font-weight: 700; }
+.cf-hero .cf-hint { margin-top: 10px; }
+
+/* picks: a ranked board of rows, not three identical cards */
+.cf-pickgrid { grid-template-columns: 1fr !important; gap: 0 !important; border-top: 1px solid var(--line); }
+.cf-pick { display: grid !important; grid-template-columns: 64px minmax(0, 1fr) minmax(150px, auto) minmax(220px, 260px); grid-template-rows: auto auto;
+  column-gap: 24px; row-gap: 2px; align-items: center; background: none !important; border: 0 !important; border-bottom: 1px solid var(--line) !important;
+  border-radius: 0 !important; padding: 20px 4px !important; box-shadow: none !important; transform: none !important; }
+.cf-pick:hover { background: rgba(242,184,75,.04) !important; }
+.cf-pick-rank { position: static !important; grid-row: 1 / 3; font-family: var(--display); font-weight: 800; font-size: 56px !important; line-height: 1; color: var(--line) !important; }
+.cf-pick:hover .cf-pick-rank { color: var(--gold) !important; }
+.cf-pick-title { grid-column: 2; font-size: 17px; padding-right: 0 !important; }
+.cf-pick-org { grid-column: 2; }
+.cf-pick-big { grid-column: 3; grid-row: 1; font-family: var(--display) !important; font-weight: 800; font-size: 40px !important; color: var(--gold); margin: 0 !important; text-align: right; }
+.cf-pick-biglabel { grid-column: 3; grid-row: 2; margin: 0 !important; text-align: right; }
+.cf-pick-bar { display: none !important; }
+.cf-pick-meta { grid-column: 4; grid-row: 1 / 3; display: grid !important; grid-template-columns: repeat(3, auto); gap: 2px 18px !important; justify-content: end; }
+.cf-pick-meta span { display: grid; text-align: right; }
+.cf-pick-meta b { font-family: var(--display); font-size: 24px; font-weight: 600; line-height: 1.1; }
+@media (max-width: 900px) {
+  .cf-pick { grid-template-columns: 44px minmax(0, 1fr) auto; }
+  .cf-pick-rank { font-size: 40px !important; }
+  .cf-pick-meta { grid-column: 2 / 4; grid-row: 3; justify-content: start; margin-top: 8px; }
+  .cf-pick-meta span { text-align: left; }
+  .cf-pick-big { font-size: 32px !important; }
+}
+
+/* category as a quiet tag instead of a middle-dot string */
+.cf-cat { display: inline-block; margin-left: 8px; padding: 0 7px; border: 1px solid var(--line); border-radius: 99px; font-size: 11.5px; color: var(--muted); }
+
+/* sentence-case headings and table, numbers in the text face with tabular figures */
+.cf-sechead h2, .cf-charts h2, .cf-tablehead h2 { font-family: var(--display); font-weight: 800; font-size: 30px !important; letter-spacing: .005em; }
+.cf-table th { text-transform: none !important; letter-spacing: 0 !important; font-size: 12.5px !important; font-weight: 500; }
+.cf-table td, .cf-table td:first-child { font-family: var(--text) !important; font-size: 13px !important; font-variant-numeric: tabular-nums; }
+.cf-pop-label { text-transform: none !important; letter-spacing: 0 !important; font-size: 12.5px !important; }
+.cf-panel { background: var(--panel) !important; border-color: var(--line) !important; }
+.cf-mark { background: var(--gold) !important; border-radius: 3px !important; }
+.cf-brand { font-family: var(--display); font-size: 22px !important; font-weight: 800 !important; letter-spacing: .01em; }
+.cf-chip:has(input:checked), .cf-tog input { accent-color: var(--gold); }
+:focus-visible { outline: 2px solid var(--gold) !important; outline-offset: 2px; }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
 <script>window.__COLORS = ["#f2b84b", "#4cc9f0", "#b388ff", "#3ecf8e"]; window.__DATA_URL = '../../data/campaigns.json';</script>
@@ -235,16 +290,15 @@ window.dash = (() => {
   <aside class="cf-side" aria-label="Sections and filters">
     <div class="cf-brand"><span class="cf-mark" aria-hidden="true"></span>Campaign Finder</div>
     <nav class="cf-nav" aria-label="Sections">
-      <a href="#picks">Best picks</a><a href="#kpis">Overview</a><a href="#map">Budget vs competition</a><a href="#cats">Categories</a><a href="#list">All campaigns</a>
+      <a href="#picks">Best picks</a><a href="#top">Overview</a><a href="#map">Budget vs competition</a><a href="#cats">Categories</a><a href="#list">All campaigns</a>
     </nav>
 
     <p class="cf-sidefoot" data-draw="side-updated">—</p>
   </aside>
 <div class="cf" data-source="campaigns">
   <header class="cf-head cf-hero" id="top">
-    <p class="cf-eyebrow">Content Rewards · refreshed every 4 hours</p>
-    <h1>Campaign Finder</h1>
-    <p class="cf-take" data-read lang="en"><b data-draw="t-count">—</b> campaigns match your filters, with <b data-draw="t-left">—</b> still unspent. Most budget per creator: <b data-draw="t-best">—</b>.</p>
+    <h1 class="cf-board"><span data-draw="h-left" data-source="campaigns">—</span> is still up for grabs across <span data-draw="h-count" data-source="campaigns">—</span>.</h1>
+    <p class="cf-take" data-read lang="en">The best money per creator right now is in <b data-draw="t-best">—</b>. Campaigns pay a median of <b data-draw="k-rate">—</b> per 1,000 views and have a median of <b data-draw="k-cr">—</b> creators competing.</p>
     <p class="cf-hint" data-draw="t-updated">—</p>
   </header>
 
@@ -252,18 +306,13 @@ window.dash = (() => {
 
 
   <section class="cf-picks" id="picks">
-    <div class="cf-sechead"><h2>Best picks right now</h2><p class="cf-hint">Most budget per creator among campaigns already paying out, with 3+ creators, under your filters.</p></div>
+    <div class="cf-sechead"><h2>Best picks right now</h2><p class="cf-hint">Ranked by money left per creator, among campaigns already paying out with at least 3 creators.</p></div>
     <div class="cf-pickgrid" data-draw="picks" data-source="campaigns"></div>
   </section>
 
 
 
-  <section class="cf-kpis" id="kpis" aria-label="Summary">
-    <div class="cf-panel cf-kpi"><div class="cf-k">Matching campaigns</div><div class="cf-v" data-draw="k-count">—</div><div class="cf-s" data-draw="k-count-s">—</div></div>
-    <div class="cf-panel cf-kpi"><div class="cf-k">Budget still unspent</div><div class="cf-v" data-draw="k-left">—</div><div class="cf-s" data-draw="k-left-s">—</div></div>
-    <div class="cf-panel cf-kpi"><div class="cf-k">Median pay per 1K views</div><div class="cf-v" data-draw="k-rate">—</div><div class="cf-s">best platform rate per campaign</div></div>
-    <div class="cf-panel cf-kpi"><div class="cf-k">Median creators</div><div class="cf-v" data-draw="k-cr">—</div><div class="cf-s">competing in each campaign</div></div>
-  </section>
+
 
   <section class="cf-charts">
     <div class="cf-panel" id="map">
@@ -322,7 +371,7 @@ window.dash = (() => {
     hideGamb: true, hideNonEn: true, hideFace: true, paying: false, podcast: false, cpm: false,
     brush: null, sort: 'left_per_creator', limit: 100,
   };
-  window.CF_redraw = (except) => ['b-search', 'b-cat', 'b-budget', 'b-more', 'b-count', 'cat-list', 'picks', 'side-updated', 't-updated', 't-count', 't-left', 't-best', 'k-count', 'k-count-s', 'k-left', 'k-left-s', 'k-rate', 'k-cr', 'scatter', 'bars', 'rows', 'shown']
+  window.CF_redraw = (except) => ['b-search', 'b-cat', 'b-budget', 'b-more', 'b-count', 'cat-list', 'h-left', 'h-count', 'picks', 'side-updated', 't-updated', 't-count', 't-left', 't-best', 'k-count', 'k-count-s', 'k-left', 'k-left-s', 'k-rate', 'k-cr', 'scatter', 'bars', 'rows', 'shown']
     .filter((n) => n !== except).forEach((n) => dash.draw(n));
   window.CF_rows = () => { const d = dash.data('campaigns'); return d.status === 'ok' ? d.data : null; };
   // skip: 'cat' (bars), 'brush' (scatter) for cross-filtering
@@ -453,7 +502,7 @@ window.dash = (() => {
   dash.draw('t-best', (el) => {
     const v = view(); if (!v || !v.length) return T(el, '—');
     const b = d3.greatest(v, (r) => r.left_per_creator);
-    T(el, `${b.campaign} (${F.k(b.left)} left, ${b.creators} creator${b.creators === 1 ? '' : 's'})`);
+    T(el, `${b.campaign}, with ${F.k(b.left)} left and ${b.creators} creator${b.creators === 1 ? '' : 's'}`);
   });
   dash.draw('t-updated', (el) => {
     const m = (window.__META || {}); if (!m.updated) return T(el, '—');
@@ -480,6 +529,19 @@ window.dash = (() => {
     document.querySelectorAll('.cf-th[data-sort]').forEach((th) => th.classList.toggle('cf-sorted', th.dataset.sort === window.CF.sort));
   });
 
+  // ---------- headline: the finding itself ----------
+  const reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let counted = false;
+  dash.draw('h-left', (el) => {
+    const v = view(); if (!v) return T(el, '—');
+    const total = d3.sum(v, (r) => r.left);
+    if (counted || reduce) return T(el, F.money(total));
+    counted = true; const t0 = performance.now(), dur = 900;
+    const tick = (now) => { const p = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - p, 4); el.textContent = F.money(Math.round(total * e)); if (p < 1) requestAnimationFrame(tick); };
+    requestAnimationFrame(tick);
+  });
+  dash.draw('h-count', (el) => { const v = view(); T(el, v ? `${F.int(v.length)} campaign${v.length === 1 ? '' : 's'}` : '—'); });
+
   // ---------- top picks ----------
   dash.draw('picks', (el) => {
     el.replaceChildren();
@@ -488,11 +550,11 @@ window.dash = (() => {
     if (!top.length) { const p = document.createElement('p'); p.className = 'cf-hint'; p.textContent = 'No paying campaign matches these filters.'; el.append(p); return; }
     top.forEach((r, i) => {
       const a = document.createElement('a'); a.className = 'cf-pick'; a.href = r.url; a.target = '_blank'; a.rel = 'noopener';
-      const rank = document.createElement('span'); rank.className = 'cf-pick-rank'; rank.textContent = '#' + (i + 1);
+      const rank = document.createElement('span'); rank.className = 'cf-pick-rank'; rank.textContent = String(i + 1);
       const t = document.createElement('span'); t.className = 'cf-pick-title'; t.textContent = r.campaign;
-      const o = document.createElement('span'); o.className = 'cf-pick-org'; o.textContent = `${r.org} · ${r.category}`;
+      const o = document.createElement('span'); o.className = 'cf-pick-org'; o.textContent = r.org; const ct = document.createElement('span'); ct.className = 'cf-cat'; ct.textContent = r.category; o.append(ct);
       const big = document.createElement('span'); big.className = 'cf-pick-big'; big.textContent = F.k(r.left);
-      const bl = document.createElement('span'); bl.className = 'cf-pick-biglabel'; bl.textContent = 'still up for grabs';
+      const bl = document.createElement('span'); bl.className = 'cf-pick-biglabel'; bl.textContent = 'left to earn';
       const meta = document.createElement('span'); meta.className = 'cf-pick-meta';
       [[F.int(r.creators), 'creators'], [r.per_post ? 'per post' : F.rate(r.rate), 'per 1K'], [r.max_payout != null ? F.money(r.max_payout) : '—', 'max / clip']].forEach(([val, lab]) => {
         const s = document.createElement('span'); const b = document.createElement('b'); b.textContent = val; s.append(b, ' ' + lab); meta.append(s);
@@ -534,7 +596,7 @@ window.dash = (() => {
       const td = (txt) => { const c = document.createElement('td'); c.textContent = txt; tr.append(c); return c; };
       const first = document.createElement('td');
       const a = document.createElement('a'); a.href = r.url; a.target = '_blank'; a.rel = 'noopener'; a.textContent = r.campaign;
-      const o = document.createElement('span'); o.className = 'cf-org'; o.textContent = `${r.org} · ${r.category}`;
+      const o = document.createElement('span'); o.className = 'cf-org'; o.textContent = r.org; const ct = document.createElement('span'); ct.className = 'cf-cat'; ct.textContent = r.category; o.append(ct);
       first.append(a, o); tr.append(first);
       td(r.type);
       const pc = document.createElement('td');

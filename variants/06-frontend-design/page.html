@@ -179,16 +179,15 @@
   <aside class="cf-side" aria-label="Sections and filters">
     <div class="cf-brand"><span class="cf-mark" aria-hidden="true"></span>Campaign Finder</div>
     <nav class="cf-nav" aria-label="Sections">
-      <a href="#picks">Best picks</a><a href="#kpis">Overview</a><a href="#map">Budget vs competition</a><a href="#cats">Categories</a><a href="#list">All campaigns</a>
+      <a href="#picks">Best picks</a><a href="#top">Overview</a><a href="#map">Budget vs competition</a><a href="#cats">Categories</a><a href="#list">All campaigns</a>
     </nav>
 
     <p class="cf-sidefoot" data-draw="side-updated">—</p>
   </aside>
 <div class="cf" data-source="campaigns">
   <header class="cf-head cf-hero" id="top">
-    <p class="cf-eyebrow">Content Rewards · refreshed every 4 hours</p>
-    <h1>Campaign Finder</h1>
-    <p class="cf-take" data-read lang="en"><b data-draw="t-count">—</b> campaigns match your filters, with <b data-draw="t-left">—</b> still unspent. Most budget per creator: <b data-draw="t-best">—</b>.</p>
+    <h1 class="cf-board"><span data-draw="h-left" data-source="campaigns">—</span> is still up for grabs across <span data-draw="h-count" data-source="campaigns">—</span>.</h1>
+    <p class="cf-take" data-read lang="en">The best money per creator right now is in <b data-draw="t-best">—</b>. Campaigns pay a median of <b data-draw="k-rate">—</b> per 1,000 views and have a median of <b data-draw="k-cr">—</b> creators competing.</p>
     <p class="cf-hint" data-draw="t-updated">—</p>
   </header>
 
@@ -196,18 +195,13 @@
 
 
   <section class="cf-picks" id="picks">
-    <div class="cf-sechead"><h2>Best picks right now</h2><p class="cf-hint">Most budget per creator among campaigns already paying out, with 3+ creators, under your filters.</p></div>
+    <div class="cf-sechead"><h2>Best picks right now</h2><p class="cf-hint">Ranked by money left per creator, among campaigns already paying out with at least 3 creators.</p></div>
     <div class="cf-pickgrid" data-draw="picks" data-source="campaigns"></div>
   </section>
 
 
 
-  <section class="cf-kpis" id="kpis" aria-label="Summary">
-    <div class="cf-panel cf-kpi"><div class="cf-k">Matching campaigns</div><div class="cf-v" data-draw="k-count">—</div><div class="cf-s" data-draw="k-count-s">—</div></div>
-    <div class="cf-panel cf-kpi"><div class="cf-k">Budget still unspent</div><div class="cf-v" data-draw="k-left">—</div><div class="cf-s" data-draw="k-left-s">—</div></div>
-    <div class="cf-panel cf-kpi"><div class="cf-k">Median pay per 1K views</div><div class="cf-v" data-draw="k-rate">—</div><div class="cf-s">best platform rate per campaign</div></div>
-    <div class="cf-panel cf-kpi"><div class="cf-k">Median creators</div><div class="cf-v" data-draw="k-cr">—</div><div class="cf-s">competing in each campaign</div></div>
-  </section>
+
 
   <section class="cf-charts">
     <div class="cf-panel" id="map">
@@ -266,7 +260,7 @@
     hideGamb: true, hideNonEn: true, hideFace: true, paying: false, podcast: false, cpm: false,
     brush: null, sort: 'left_per_creator', limit: 100,
   };
-  window.CF_redraw = (except) => ['b-search', 'b-cat', 'b-budget', 'b-more', 'b-count', 'cat-list', 'picks', 'side-updated', 't-updated', 't-count', 't-left', 't-best', 'k-count', 'k-count-s', 'k-left', 'k-left-s', 'k-rate', 'k-cr', 'scatter', 'bars', 'rows', 'shown']
+  window.CF_redraw = (except) => ['b-search', 'b-cat', 'b-budget', 'b-more', 'b-count', 'cat-list', 'h-left', 'h-count', 'picks', 'side-updated', 't-updated', 't-count', 't-left', 't-best', 'k-count', 'k-count-s', 'k-left', 'k-left-s', 'k-rate', 'k-cr', 'scatter', 'bars', 'rows', 'shown']
     .filter((n) => n !== except).forEach((n) => dash.draw(n));
   window.CF_rows = () => { const d = dash.data('campaigns'); return d.status === 'ok' ? d.data : null; };
   // skip: 'cat' (bars), 'brush' (scatter) for cross-filtering
@@ -397,7 +391,7 @@
   dash.draw('t-best', (el) => {
     const v = view(); if (!v || !v.length) return T(el, '—');
     const b = d3.greatest(v, (r) => r.left_per_creator);
-    T(el, `${b.campaign} (${F.k(b.left)} left, ${b.creators} creator${b.creators === 1 ? '' : 's'})`);
+    T(el, `${b.campaign}, with ${F.k(b.left)} left and ${b.creators} creator${b.creators === 1 ? '' : 's'}`);
   });
   dash.draw('t-updated', (el) => {
     const m = (window.__META || {}); if (!m.updated) return T(el, '—');
@@ -424,6 +418,19 @@
     document.querySelectorAll('.cf-th[data-sort]').forEach((th) => th.classList.toggle('cf-sorted', th.dataset.sort === window.CF.sort));
   });
 
+  // ---------- headline: the finding itself ----------
+  const reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let counted = false;
+  dash.draw('h-left', (el) => {
+    const v = view(); if (!v) return T(el, '—');
+    const total = d3.sum(v, (r) => r.left);
+    if (counted || reduce) return T(el, F.money(total));
+    counted = true; const t0 = performance.now(), dur = 900;
+    const tick = (now) => { const p = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - p, 4); el.textContent = F.money(Math.round(total * e)); if (p < 1) requestAnimationFrame(tick); };
+    requestAnimationFrame(tick);
+  });
+  dash.draw('h-count', (el) => { const v = view(); T(el, v ? `${F.int(v.length)} campaign${v.length === 1 ? '' : 's'}` : '—'); });
+
   // ---------- top picks ----------
   dash.draw('picks', (el) => {
     el.replaceChildren();
@@ -432,11 +439,11 @@
     if (!top.length) { const p = document.createElement('p'); p.className = 'cf-hint'; p.textContent = 'No paying campaign matches these filters.'; el.append(p); return; }
     top.forEach((r, i) => {
       const a = document.createElement('a'); a.className = 'cf-pick'; a.href = r.url; a.target = '_blank'; a.rel = 'noopener';
-      const rank = document.createElement('span'); rank.className = 'cf-pick-rank'; rank.textContent = '#' + (i + 1);
+      const rank = document.createElement('span'); rank.className = 'cf-pick-rank'; rank.textContent = String(i + 1);
       const t = document.createElement('span'); t.className = 'cf-pick-title'; t.textContent = r.campaign;
-      const o = document.createElement('span'); o.className = 'cf-pick-org'; o.textContent = `${r.org} · ${r.category}`;
+      const o = document.createElement('span'); o.className = 'cf-pick-org'; o.textContent = r.org; const ct = document.createElement('span'); ct.className = 'cf-cat'; ct.textContent = r.category; o.append(ct);
       const big = document.createElement('span'); big.className = 'cf-pick-big'; big.textContent = F.k(r.left);
-      const bl = document.createElement('span'); bl.className = 'cf-pick-biglabel'; bl.textContent = 'still up for grabs';
+      const bl = document.createElement('span'); bl.className = 'cf-pick-biglabel'; bl.textContent = 'left to earn';
       const meta = document.createElement('span'); meta.className = 'cf-pick-meta';
       [[F.int(r.creators), 'creators'], [r.per_post ? 'per post' : F.rate(r.rate), 'per 1K'], [r.max_payout != null ? F.money(r.max_payout) : '—', 'max / clip']].forEach(([val, lab]) => {
         const s = document.createElement('span'); const b = document.createElement('b'); b.textContent = val; s.append(b, ' ' + lab); meta.append(s);
@@ -478,7 +485,7 @@
       const td = (txt) => { const c = document.createElement('td'); c.textContent = txt; tr.append(c); return c; };
       const first = document.createElement('td');
       const a = document.createElement('a'); a.href = r.url; a.target = '_blank'; a.rel = 'noopener'; a.textContent = r.campaign;
-      const o = document.createElement('span'); o.className = 'cf-org'; o.textContent = `${r.org} · ${r.category}`;
+      const o = document.createElement('span'); o.className = 'cf-org'; o.textContent = r.org; const ct = document.createElement('span'); ct.className = 'cf-cat'; ct.textContent = r.category; o.append(ct);
       first.append(a, o); tr.append(first);
       td(r.type);
       const pc = document.createElement('td');

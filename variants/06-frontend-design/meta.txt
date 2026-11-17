@@ -1,5 +1,5 @@
 name=Frontend Design (Anthropic)
-fonts=Manrope:wght@400;600;800&family=IBM+Plex+Mono:wght@500;600
+fonts=Big+Shoulders+Display:wght@600;800&family=Schibsted+Grotesk:wght@400;500;700
 colors=["#f2b84b", "#4cc9f0", "#b388ff", "#3ecf8e"]
-status=pending
-note=
+status=done
+note=Art-directed pass: a scoreboard typeface, the headline is the live finding in one sentence, picks as a ranked board, no eyebrows, all-caps labels or middle-dot meta, one count-up on load.
