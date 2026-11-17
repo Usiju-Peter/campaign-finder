@@ -101,5 +101,5 @@ os.makedirs(os.path.join(ROOT, "public", "directions"), exist_ok=True)
 for k in LOOKS:
     open(os.path.join(ROOT, "public", "directions", k + ".html"), "w", encoding="utf-8").write(build(k, True))
 default = sys.argv[1] if len(sys.argv) > 1 else "a"
-open(os.path.join(ROOT, "public", "index.html"), "w", encoding="utf-8").write(build(default, False))
-print("built index (" + default + ") + directions a, b, c")
+# the main page (public/index.html) is now the simple table and is edited by hand; look A lives on at /directions/
+print("built directions a, b, c")
